@@ -1,0 +1,24 @@
+{
+  "name": "curso-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ale6100/Curso-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ale6100/Curso-backend/issues"
+  },
+  "homepage": "https://github.com/Ale6100/Curso-backend#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

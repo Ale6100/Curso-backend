@@ -1,0 +1,20 @@
+[
+	{
+		"title": "Título 1",
+		"price": 100,
+		"img": "https://dummyimage.com/100x400/000/fff",
+		"id": 1
+	},
+	{
+		"title": "Título 2",
+		"price": 200,
+		"img": "https://dummyimage.com/200x400/000/fff",
+		"id": 2
+	},
+	{
+		"title": "Título 3",
+		"price": 300,
+		"img": "https://dummyimage.com/300x400/000/fff",
+		"id": 3
+	}
+]
