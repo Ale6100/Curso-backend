@@ -1,0 +1,8 @@
+[
+	{
+		"title": "Producto 1 de ejemplo",
+		"price": "1000",
+		"image": "http://localhost:8080/images/1667228393023-programadoresNombrandoVariables.jpg",
+		"id": 1
+	}
+]

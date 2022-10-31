@@ -1,14 +1,17 @@
 import fs from "fs" // Trae el módulo local fs
+import __dirname from "./utils.js"
 
-class Contenedor {
+const direccion = (name) => `${__dirname}/json/${name}.json` // Ruta al archivo json donde se almacenan los datos
+
+class Contenedor { // Estructura del objeto que manipula al archivo
     constructor(nombreDelArchivo) {
         this.nombre = nombreDelArchivo
     }
 
     async getAll() { // Devuelve un array con todos los objetos presentes en el archivo
         let datosArchivo = []
-        if (fs.existsSync(`${this.nombre}.json`)) { // Si el archivo con el array de objetos existe, devuelve ese array
-            datosArchivo = await fs.promises.readFile(`${this.nombre}.json`, "utf-8")
+        if (fs.existsSync(direccion(this.nombre))) { // Si el archivo con el array de objetos existe, devuelve ese array
+            datosArchivo = await fs.promises.readFile(direccion(this.nombre), "utf-8")
             datosArchivo = JSON.parse(datosArchivo)
         }
         return datosArchivo
@@ -25,7 +28,7 @@ class Contenedor {
         objeto.id = idAAgregar // Le agrega al objeto el id mencionado
         datosArchivo.push(objeto) // y luego agrega el objeto actualizado al array
         datosArchivo = JSON.stringify(datosArchivo, null, "\t") // Pasa el array a formato json
-        await fs.promises.writeFile(`${this.nombre}.json`, datosArchivo) // Actualiza el archivo con el nuevo objeto agregado
+        await fs.promises.writeFile(direccion(this.nombre), datosArchivo) // Actualiza el archivo con el nuevo objeto agregado
         return idAAgregar // Retorna el id asignado
     }
 
@@ -36,15 +39,24 @@ class Contenedor {
 
     async deleteById(id) { // Elimina del archivo el objeto con el id buscado
         let datosArchivo = await this.getAll()
-        datosArchivo = datosArchivo.filter(objeto => objeto.id !== id)
+        datosArchivo = datosArchivo.filter(objeto => objeto.id != id)
         datosArchivo = JSON.stringify(datosArchivo, null, "\t")
-        await fs.promises.writeFile(`${this.nombre}.json`, datosArchivo) // Actualiza el array en el archivo
+        await fs.promises.writeFile(direccion(this.nombre), datosArchivo) // Actualiza el array en el archivo
     }
 
     async deleteAll() { // Vacía el array del archivo
-        if (fs.existsSync(`${this.nombre}.json`)) {
-            await fs.promises.writeFile(`${this.nombre}.json`, "[]")
+        if (fs.existsSync(direccion(this.nombre))) {
+            await fs.promises.writeFile(direccion(this.nombre), "[]")
         }
+    }
+
+    async update(objetoActualizado, id) { // Actualiza el objeto en el archivo según su id
+        let datosArchivo = await this.getAll()
+        const indiceObjeto = datosArchivo.findIndex(objeto => objeto.id == id)
+        objetoActualizado.id = id // Si el objeto se ejecuta gracias a un programa como Postman o Thunder Client en vez del formulario del index, necesitamos esta línea
+        datosArchivo[indiceObjeto] = objetoActualizado
+        datosArchivo = JSON.stringify(datosArchivo, null, "\t")
+        await fs.promises.writeFile(direccion(this.nombre), datosArchivo)
     }
 }
 
