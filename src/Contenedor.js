@@ -18,6 +18,7 @@ class Contenedor { // Estructura del objeto que manipula al archivo
     }
        
     async save(objeto) { // Recibe un objeto, lo guarda en el archivo y devuelve el id asignado
+        objeto.price = objeto.price == undefined ? undefined : parseFloat(objeto.price) // Me aseguro de que la propiedad "price" sea un número, siempre y cuando la propiedad esté definida
         let datosArchivo = await this.getAll()
         let idAAgregar        
         if (datosArchivo.length === 0) { // El propósito de este if-else es asegurar que el id agregado es único en el array
@@ -53,7 +54,7 @@ class Contenedor { // Estructura del objeto que manipula al archivo
     async update(objetoActualizado, id) { // Actualiza el objeto en el archivo según su id
         let datosArchivo = await this.getAll()
         const indiceObjeto = datosArchivo.findIndex(objeto => objeto.id == id)
-        objetoActualizado.id = id // Si el objeto se ejecuta gracias a un programa como Postman o Thunder Client en vez del formulario del index, necesitamos esta línea
+        objetoActualizado.id = id
         datosArchivo[indiceObjeto] = objetoActualizado
         datosArchivo = JSON.stringify(datosArchivo, null, "\t")
         await fs.promises.writeFile(direccion(this.nombre), datosArchivo)

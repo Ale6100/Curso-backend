@@ -1,8 +1,14 @@
 [
 	{
-		"title": "Producto 1 de ejemplo",
-		"price": "1000",
-		"image": "http://localhost:8080/images/1667228393023-programadoresNombrandoVariables.jpg",
+		"title": "Guitarra",
+		"price": 10000,
+		"image": "http://localhost:8080/images/1667514324959-guitarra_imagen.jpg",
 		"id": 1
+	},
+	{
+		"title": "Piano",
+		"price": 10500,
+		"image": "http://localhost:8080/images/1667514362052-piano_imagen.jpg",
+		"id": 2
 	}
 ]

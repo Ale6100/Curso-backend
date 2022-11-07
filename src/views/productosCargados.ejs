@@ -1,0 +1,23 @@
+<%- include("./partials/head") %> <!-- Importo el partial head (análogo a un componente de React) -->
+
+<main>
+    <h1>Productos cargados</h1>
+
+    <div>
+        <% if (arrayProductos.length > 0) { %>
+            <ul class="card-product">
+                <% arrayProductos.forEach(producto => { %>
+                    <div>
+                        <li> Título: <%= producto.title %>  </li>
+                        <li> Precio: $<%= producto.price %>  </li>         
+                        <li> Imagen: <img src=<%= `${producto.image}` %>> </li>
+                    </div>
+                <% }) %>
+            </ul>
+        <% } else {%>
+            <p>No hay productos por mostrar</p>
+        <% } %> 
+    </div>
+    
+    <a href="/">Ir a la página principal</a>
+</main>

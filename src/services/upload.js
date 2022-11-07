@@ -6,6 +6,7 @@ const storage = multer.diskStorage({ // Configura un almacenamiento de servidor 
         cb(null, __dirname + "/public/images")
     },
     filename: (req, file, cb) => { // Nombre del archivo cargado
+        file.originalname = file.originalname.split(" ").join("") // Pido que se le recorten los espacios al nombre del archivo
         cb(null, Date.now()+"-"+file.originalname)
     }
 })

@@ -1,0 +1,24 @@
+<%- include("./partials/head") %>
+
+<main>
+    <!-- Manda una petición a la ruta productos con el método post -->
+    <form action="/productos" method="post" enctype="multipart/form-data">  <!-- El string de enctype es para que acepte leer multer (para subir imágenes) -->
+        <Label>Titulo
+            <input type="text" name="title">
+        </Label>
+
+        <Label>Precio
+            <input type="number" name="price">
+        </Label>
+
+        <Label>Imagen
+            <input type="file" name="image">
+        </Label>
+
+        <button>Enviar producto</button>
+    </form>
+
+    <a href="/productos">Ver los productos cargados</a>
+
+</main>
+

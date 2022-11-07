@@ -2,7 +2,7 @@ import { Router } from "express";
 import Contenedor from "../Contenedor.js";
 import uploader from "../services/upload.js";
 
-const router = Router(); // Inicializamos el reouter
+const router = Router(); // Inicializamos el router
 
 const contenedor = new Contenedor("productos");
 
@@ -58,7 +58,6 @@ router.put("/:idProducto", uploader.single("image"), async (req, res) => {
                 title: producto.title,
                 price: producto.price,
                 image: producto.image,
-                id: parseInt(idProducto)
             }
             await contenedor.update(objetoActualizado, idProducto)
             res.send({ status: "sucess", message: `Producto con id ${idProducto} actualizado`})
