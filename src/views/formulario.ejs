@@ -4,11 +4,11 @@
     <!-- Manda una petición a la ruta productos con el método post -->
     <form action="/productos" method="post" enctype="multipart/form-data">  <!-- El string de enctype es para que acepte leer multer (para subir imágenes) -->
         <Label>Titulo
-            <input type="text" name="title">
+            <input type="text" name="title" required>
         </Label>
 
         <Label>Precio
-            <input type="number" name="price">
+            <input type="number" name="price" required>
         </Label>
 
         <Label>Imagen
@@ -18,7 +18,11 @@
         <button>Enviar producto</button>
     </form>
 
-    <a href="/productos">Ver los productos cargados</a>
+    <a href="/productos">Ver los productos cargados (el antiguo sin socket)</a>
+    <a href="/chat">Ir a la sala de chat</a>
 
+    <%- include("./productosEnTiempoReal.ejs") %> 
 </main>
 
+<script src="/socket.io/socket.io.js"></script>
+<script src="./js/script.js"></script>

@@ -12,7 +12,7 @@ class Contenedor { // Estructura del objeto que manipula al archivo
         let datosArchivo = []
         if (fs.existsSync(direccion(this.nombre))) { // Si el archivo con el array de objetos existe, devuelve ese array
             datosArchivo = await fs.promises.readFile(direccion(this.nombre), "utf-8")
-            datosArchivo = JSON.parse(datosArchivo)
+            datosArchivo = datosArchivo == "" ? [] : JSON.parse(datosArchivo) // Si el json existía pero estaba vacío, entonces nos quedamos con el array vacío. Sino, devolvemos el array con los elementos dentro
         }
         return datosArchivo
     }

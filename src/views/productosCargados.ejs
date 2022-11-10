@@ -10,7 +10,7 @@
                     <div>
                         <li> Título: <%= producto.title %>  </li>
                         <li> Precio: $<%= producto.price %>  </li>         
-                        <li> Imagen: <img src=<%= `${producto.image}` %>> </li>
+                        <li> Imagen: <img src=<%= producto.image %>> </li>
                     </div>
                 <% }) %>
             </ul>
@@ -20,4 +20,5 @@
     </div>
     
     <a href="/">Ir a la página principal</a>
+    <a href="/chat">Ir a la sala de chat</a>
 </main>
