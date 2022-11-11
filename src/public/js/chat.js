@@ -29,7 +29,9 @@ chatBox.addEventListener("keyup", e => {
     if (e.key === "Enter") {
         const mensaje = chatBox.value.trim() // Quita los espacios sobrantes al principio y al final del mensaje
         if (mensaje.length > 0) { // Se ejecuta si el mensaje es un string no vacío
-            socket.emit("message", {user, message: mensaje}) // Emito un evento personalizado "message". Envío el usuario y el mensaje
+            const fecha = new Date().toLocaleDateString() // Fecha y hora en la que se mandó el mensaje
+            const hora = new Date().toLocaleTimeString()
+            socket.emit("message", {user, message: mensaje, fecha, hora}) // Emito un evento personalizado "message". Envío el usuario, el mensaje, la fecha y la hora
             chatBox.value = ""
         }
     }
@@ -38,9 +40,23 @@ chatBox.addEventListener("keyup", e => {
 const logsPanel = document.getElementById("logsPanel")
 
 socket.on("logs", data => { // Muestro los mensajes pasados
-    logsPanel.innerHTML = ""
-    data.forEach(element => {
-        logsPanel.innerHTML += `<p>${element.user} dice: ${element.message}</p>`
+    logsPanel.value = ""
+    data.forEach((element, index) => {
+        if (index === 0) { // En primer mensaje se muestra esto
+            logsPanel.value += `----- ${element.fecha} -----\n\n${element.user} dice:\n${element.hora} - ${element.message}`
+        
+        } else {
+            if (data[index].fecha !== data[index-1].fecha) { // Si un mensaje se envió un día distinto al anterior, entonces muestra la fecha de este nuevo mensaje
+                logsPanel.value += `\n\n----- ${element.fecha} -----`
+            }
+
+            if (data[index].user === data[index-1].user) { // En caso de que un usuario escriba dos mensajes seguidos
+                logsPanel.value += `\n${element.hora} - ${element.message}`
+            } else {
+                logsPanel.value += `\n\n${element.user} dice:\n${element.hora} - ${element.message}`
+            }
+        }
+        logsPanel.scrollTop = logsPanel.scrollHeight // Hago que la barra siempre vaya abajo de todo cuando enviamos un mensaje
     })
 })
 

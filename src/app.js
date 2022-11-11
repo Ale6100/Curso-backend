@@ -61,8 +61,7 @@ io.on("connection", socket => {
     socket.on("message", data => { // Recibo los datos emitidos en chat.js
         mensajes.push(data)
         io.emit("logs", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-        const date = new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() // Fecha y hora en la que se mandó el mensaje
-        contenedorHistorialChats.save( { ...data, date } ) // Guardo los datos (el mensaje que se envió junto con su usuario) y la fecha en un archivo json llamado "historialChats.json" //! Gracias a esto el chat no puede funcionar mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM
+        contenedorHistorialChats.save( data ) // Guardo los datos (el mensaje que se envió junto con su usuario) y la fecha en un archivo json llamado "historialChats.json" //! Gracias a esto el chat no puede funcionar mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM
     })
 
     socket.on("autenticado", data => {
