@@ -1,1 +1,16 @@
-[]
+[
+	{
+		"user": "Ale",
+		"message": "Mensaje de prueba :D",
+		"fecha": "17/11/2022",
+		"hora": "17:46:49",
+		"id": 1
+	},
+	{
+		"user": "Ale",
+		"message": "Segundo mensaje de prueba",
+		"fecha": "17/11/2022",
+		"hora": "17:47:06",
+		"id": 2
+	}
+]

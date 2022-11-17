@@ -3,8 +3,9 @@
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
 import __dirname from "./utils.js";
-import uploader from "./services/upload.js";
-import Contenedor from "./Contenedor.js";
+import Contenedor from "./Managers/Contenedor.js";
+import viewsProductosRouter from "./routes/views.productos.routes.js"
+import carritoRouter from "./routes/carrito.routes.js"
 import { Server } from "socket.io";
 import chatRouter from "./routes/views.chat.routes.js"
 
@@ -12,6 +13,8 @@ const app = express();
 
 const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no tenga
 const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`));
+
+let admin = true;
 
 const io = new Server(server) // io va a ser el servidor del socket. Va a estar conectado con nuestro servidor actual
 
@@ -25,34 +28,27 @@ app.use(express.urlencoded({ extended:true })); // Habilita poder procesar y par
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-app.use("/api/productos", productosRouter);
-app.use("/chat", chatRouter)
+app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
+app.use("/api/cart", carritoRouter)
+app.use("/productos", viewsProductosRouter) // Ruta donde se visualizan los productos
+app.use("/chat", chatRouter) // Ruta donde está el chat
 
-const contenedor = new Contenedor("productos")
+const contenedorProductos = new Contenedor("productos")
 
-app.get("/", (req, res) => { // Renderiza formulario.ejs en la ruta "/"
+app.get("/", (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
     res.render("formulario")
 })
 
-app.get("/productos", async (req, res) => { // Obtengo la totalidad de productos y luego los renderizo en el componente "productosCargados" en la ruta /productos
-    const arrayProductos = await contenedor.getAll()
-    res.render("productosCargados", { arrayProductos })
-})
+let mensajes = [];
 
-app.post("/productos", uploader.single("image"), async (req, res) => { // Agrega un producto al json gracias al formulario de la ruta raíz
-    const producto = req.body;
-    producto.image = `${req.protocol}://${req.hostname}:8080/images/${req.file.filename}`
-    await contenedor.save(producto)
-    res.redirect("/") // Te redirige a la ruta raíz una vez que hayas enviado el formulario
-})
-
-const mensajes = [];
 const contenedorHistorialChats = new Contenedor("historialChats")
+
+contenedorHistorialChats.getAll().then(response => mensajes = response) // Antes de iniciar el chat (justo después del npm start) recupera los mensajes del historial en caso de que haya
 
 io.on("connection", socket => {
 
     // Hago que se envíe el array actualizado de productos a todos los sockets cada vez que se conecta un socket (recordemos que al enviar el formulario el usuario va a una ruta y vuelve a la principal rápidamente. En ese caso es como si se hubiera conectado un nuevo socket, lo que provocaría que esta función se ejecute)
-    contenedor.getAll().then(arrayProductos => {
+    contenedorProductos.getAll().then(arrayProductos => {
         io.emit("enviarArray", arrayProductos)
     })
 
@@ -61,7 +57,8 @@ io.on("connection", socket => {
     socket.on("message", data => { // Recibo los datos emitidos en chat.js
         mensajes.push(data)
         io.emit("logs", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-        contenedorHistorialChats.save( data ) // Guardo los datos (el mensaje que se envió junto con su usuario) y la fecha en un archivo json llamado "historialChats.json" //! Gracias a esto el chat no puede funcionar mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM
+        contenedorHistorialChats.save( data ).then(res => res) // Guardo los datos (el mensaje que se envió junto con su usuario) y la fecha en un archivo json llamado "historialChats.json"
+        //! Gracias a esta última línea el chat no puede funcionar correctamente mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM. Si bien se recupera el chat gracias al historial, dejará de funcionar (junto con el chat) si se envían muchos mensajes muy rápido
     })
 
     socket.on("autenticado", data => {
