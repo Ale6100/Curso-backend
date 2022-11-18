@@ -14,8 +14,6 @@ const app = express();
 const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no tenga
 const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`));
 
-let admin = true;
-
 const io = new Server(server) // io va a ser el servidor del socket. Va a estar conectado con nuestro servidor actual
 
 server.on("error", error => console.log(error)); // En caso de que haya un error en la puesta en marcha del servidor
