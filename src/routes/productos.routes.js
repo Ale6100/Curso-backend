@@ -5,16 +5,7 @@ const router = Router(); // Inicializamos el router
 
 const contenedor = new Contenedor("productos");
 
-let admin = false; // Valor booleano que indica si el usuario tiene permisos de administrador
-
-const stringAleatorio = (n) => { // Devuelve un string aleatorio de longitud n
-    const simbolos = "abcdefghijklmnopqrstuvwxyz0123456789¡!¿?@#$%&()+-=*,.;:_"
-    let stringRandom = ""
-    for (let i=1; i<=n; i++) {
-        stringRandom += simbolos[parseInt(simbolos.length*Math.random())]
-    }
-    return stringRandom
-}
+let admin = true; // Valor booleano que indica si el usuario tiene permisos de administrador
 
 router.get("/", async (req, res) => { // En /api/products devuelve todos los productos disponibles
     const result = await contenedor.getAll()
@@ -49,8 +40,6 @@ router.post("/", async (req, res) => { // Agrega un producto al archivo gracias 
             price: parseFloat(price),
             stock
         }
-        producto.timestamp = Date.now()
-        producto.code = stringAleatorio(10)
         const result = await contenedor.save(producto)
         res.send({ status: "sucess", message: "Product added", idProduct: result })
     }
@@ -81,7 +70,6 @@ router.put("/:pid", async (req, res) => {
         res.status(400).send({ status: "error", error: "Incomplete values" })
     
     } else if (datosArchivo.some(objeto => objeto.id == pid)) {
-        producto.code = datosArchivo.find(objeto => objeto.id == pid).code // La propiedad code debe ser la misma que antes ya que es un identificador, al igual que el id
         await contenedor.update(producto, pid)
         res.send({ status: "sucess", message: `Producto con id ${pid} actualizado`})
 

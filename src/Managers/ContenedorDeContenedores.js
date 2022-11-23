@@ -45,29 +45,22 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
 
     async saveContainerInContainer(idContGrande, idContChico) { // Guarda el id de un contendor dentro de otro. La propiedad quantity nos especifica cuantas veces el contenedor de adentro (que denomino "chico") está en el de afuera. Necesitamos el id de ambos para poder referenciarlos
         const datosArchivo = await this.getAll();
-        let newDatosArchivo = datosArchivo.map( objeto => { // Modifica únicamente el contenedor de contenedores solicitado según su id
-            if (objeto.id === idContGrande) {
-                
-                if (objeto.contenedor.some(producto => producto.id === idContChico)) { // Si el id del contenedor chico ya está dentro del grande, entonces sólo me concentro en aumentarle en 1 la cantidad
-                    const nuevoContenedor = objeto.contenedor.map(producto => {
-                        if (producto.id === idContChico) {
-                            producto.quantity++
-                        }
-                        return producto
-                    })
-                    objeto.contenedor = nuevoContenedor
+        let productos = datosArchivo.find(elemento => elemento.id == idContGrande).contenedor // Accede al contenedor de contenedores que me interesa
 
-                } else { // Si el id del contenedor chico aún no estaba en el grande, entonces lo agrego 
-                    objeto.contenedor.push({
-                        "id": idContChico,
-                        "quantity": 1
-                    })
+        if (productos.some(producto => producto.id == idContChico)) { // Si el contenedor pequeño ya estaba dentro del grande, le suma la cantidad
+            productos = productos.map(prod => {
+                if (prod.id === idContChico){
+                    prod.quantity++
                 }
-            }
-            return objeto
-        })
-        newDatosArchivo = JSON.stringify(newDatosArchivo, null, "\t")
-        await fs.promises.writeFile(this.path, newDatosArchivo)
+                return prod
+            })
+        } else { // Si no estaba, lo agrega mediante una referencia id y una cantidad
+            productos.push({
+                id: idContChico,
+                quantity: 1
+            })
+        }
+        await fs.promises.writeFile(this.path, JSON.stringify(datosArchivo, null, "\t"));
     }
 
     async deleteById(id) { // Vacía del archivo al contenedor con el id solicitado

@@ -1,6 +1,15 @@
 import fs from "fs" // Trae el módulo local fs
 import __dirname from "../utils.js"
 
+const stringAleatorio = (n) => { // Devuelve un string aleatorio de longitud n
+    const simbolos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!¿?@#$%&()+-=*,.;:_"
+    let stringRandom = ""
+    for (let i=1; i<=n; i++) {
+        stringRandom += simbolos[parseInt(simbolos.length*Math.random())]
+    }
+    return stringRandom
+}
+
 // Esta clase crea un objeto que manipula un archivo json con un array dentro. Dicho array contiene objetos que pueden ser agregados, modificados, borrados y consultados
 
 class Contenedor {
@@ -27,6 +36,8 @@ class Contenedor {
             const obtenerIds = datosArchivo.map(objeto => objeto.id)
             objeto.id = Math.max(...obtenerIds) + 1  // Los siguientes objetos tendrán un id igual al id de objeto más grande del array+1
         }
+        objeto.timestamp = Date.now()
+        objeto.code = stringAleatorio(10)
         datosArchivo.push(objeto) // Agrega el objeto actualizado al array
         datosArchivo = JSON.stringify(datosArchivo, null, "\t") // Pasa el array a formato json
         await fs.promises.writeFile(this.path, datosArchivo) // Actualiza el archivo agregándole el nuevo objeto
@@ -55,6 +66,7 @@ class Contenedor {
         let datosArchivo = await this.getAll()
         const indiceObjeto = datosArchivo.findIndex(objeto => objeto.id == id)
         objetoActualizado.id = parseInt(id)
+        objetoActualizado.code = datosArchivo.find(objeto => objeto.id == id).code // La propiedad code debe ser la misma que antes ya que es un identificador, al igual que el id
         datosArchivo[indiceObjeto] = objetoActualizado
         datosArchivo = JSON.stringify(datosArchivo, null, "\t")
         await fs.promises.writeFile(this.path, datosArchivo)

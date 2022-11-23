@@ -39,7 +39,7 @@ chatBox.addEventListener("keyup", e => {
 
 const logsPanel = document.getElementById("logsPanel")
 
-socket.on("logs", data => { // Muestro los mensajes pasados
+socket.on("enviarMensajes", data => { // Muestro los mensajes pasados
     logsPanel.value = ""
     data.forEach((element, index) => {
         if (index === 0) { // En primer mensaje se muestra esto

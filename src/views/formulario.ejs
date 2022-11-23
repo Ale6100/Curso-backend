@@ -7,18 +7,25 @@
             <input type="text" name="title" required>
         </Label>
 
+        <Label>Descripción
+            <input type="text" name="description" required>
+        </Label>
+
         <Label>Precio
             <input type="number" name="price" required>
         </Label>
 
         <Label>Imagen
-            <input type="file" name="image">
+            <input type="file" name="image" required>
+        </Label>
+
+        <Label>Stock
+            <input type="number" name="stock" required>
         </Label>
 
         <button>Enviar producto</button>
     </form>
 
-    <a href="/productos">Ver los productos cargados (el antiguo sin socket)</a>
     <a href="/chat">Ir a la sala de chat</a>
 
     <%- include("./productosEnTiempoReal.ejs") %>
