@@ -3,13 +3,10 @@
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
 import __dirname from "./utils.js";
-// import Contenedor from "./Managers/Contenedor.js";
-import viewsProductosRouter from "./routes/views.productos.routes.js"
+import Contenedor from "./Managers/Contenedor.js";
 import carritoRouter from "./routes/carrito.routes.js"
 import { Server } from "socket.io";
 import chatRouter from "./routes/views.chat.routes.js"
-import ContenedorSQL from "./Managers/ContenedorSQL.js" // Ya no utilizo más los json para almacenar los productos y mensajes del chat, ahora uso sqlite3
-import sqliteOptions from "./dbs/knew.js"
 
 const app = express();
 
@@ -30,40 +27,32 @@ app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de arc
 
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
 app.use("/api/cart", carritoRouter)
-app.use("/productos", viewsProductosRouter) // Ruta donde se visualizan los productos
 app.use("/chat", chatRouter) // Ruta donde está el chat
 
-// const contenedorProductos = new Contenedor("productos") // Ya no es necesario porque en esta entrega uso sqlite3 para guardar los productos
-const productsSQL = new ContenedorSQL(sqliteOptions, "products")
+const contenedorProductos = new Contenedor("productos")
 
-app.get("/", (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
-    res.render("formulario")
+app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
+    const arrayProductos = await contenedorProductos.getAll()
+    res.render("index", { arrayProductos })
 })
 
 let mensajes = [];
 
-// const contenedorHistorialChats = new Contenedor("historialChats")
-const messagesSQL = new ContenedorSQL(sqliteOptions, "messages")
+const contenedorHistorialChats = new Contenedor("historialChats")
 
-// contenedorHistorialChats.getAll().then(response => mensajes = response) 
-messagesSQL.getAll().then(response => mensajes = response) // Antes de iniciar el chat (justo después del npm start) recupera los mensajes del historial en caso de que haya
-
-// productsSQL.deleteAll() // La descomento si quiero borrar todos los productos
-// messagesSQL.deleteAll() // La descomento si quiero borrar todos los mensajes
+contenedorHistorialChats.getAll().then(response => mensajes = response) // Antes de iniciar el chat (justo después del npm start) recupera los mensajes del historial en caso de que haya
 
 io.on("connection", async socket => {
 
     // Hago que se envíe el array actualizado de productos a todos los sockets cada vez que se conecta un socket (recordemos que al enviar el formulario el usuario va a una ruta y vuelve a la principal rápidamente. En ese caso es como si se hubiera conectado un nuevo socket, lo que provocaría que esta función se ejecute)
-    // io.emit("enviarProducts", await contenedorProductos.getAll())
-    io.emit("enviarProducts", await productsSQL.getAll())
+    io.emit("enviarProducts", await contenedorProductos.getAll())
 
     socket.emit("enviarMensajes", mensajes) // Envío al usuario el array (que contiene todos los mensajes pasados) para que le muestre el historial de mensajes apenas se loguee
 
     socket.on("message", data => { // Recibo los datos emitidos en chat.js
         mensajes.push(data)
         io.emit("enviarMensajes", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-        // contenedorHistorialChats.save( data ).then(res => res)
-        messagesSQL.save( data ).then(res => res) // Guardo los datos (el mensaje que se envió junto con su usuario) y la fecha en ecommerce.sqlite
+        contenedorHistorialChats.save( data ).then(res => res)
         //! Gracias a esta última línea el chat no puede funcionar correctamente mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM. Si bien se recupera el chat gracias al historial, dejará de funcionar (junto con el chat) si se envían muchos mensajes muy rápido
     })
 

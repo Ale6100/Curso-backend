@@ -1,0 +1,17 @@
+<div>
+    <% if (arrayProductos.length > 0) { %>
+        <ul class="card-product">
+            <% arrayProductos.forEach(producto => { %>
+                <div>
+                    <li> Título: <%= producto.title %>  </li>
+                    <li> Precio: $<%= producto.price %>  </li>         
+                    <li> Imagen: <img src=<%= producto.image %>> </li>
+                    <li> Descripción: <%= producto.description %> </li>
+                    <li> Stock: <%= producto.stock %> </li>
+                </div>
+            <% }) %>
+        </ul>
+    <% } else {%>
+        <p>No hay productos por mostrar</p>
+    <% } %> 
+</div>

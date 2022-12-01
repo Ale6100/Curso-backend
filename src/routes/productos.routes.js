@@ -24,7 +24,7 @@ router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el prod
 
 router.post("/", async (req, res) => { // Agrega un producto al archivo gracias a Postman. Devuelve su id asignado
     if (!admin) {
-        return res.send({ error: -1, description: "Ruta '/api/products/1', método POST no autorizado" })
+        return res.send({ error: -1, description: "Ruta '/api/products', método POST no autorizado" })
     }
 
     const { title, description, image, price, stock } = req.body; // Traigo sólo las propiedades que me interesan, por seguridad
