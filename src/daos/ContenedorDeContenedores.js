@@ -10,7 +10,7 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         this.path = `${__dirname}/json/${this.nombre}.json` // Ruta al archivo donde se almacenan los datos
     }
 
-    async getAll() { // Devuelve un array con todos los objetos (que tienen los contenedores que nos interesan) presentes en el archivo
+    async getAll() { // Devuelve un array con todos los objetos (tienen los contenedores que nos interesan) presentes en el archivo
         let datosArchivo = []
         if (fs.existsSync(this.path)) { // Si el archivo con el array de objetos existe, devuelve ese array
             datosArchivo = await fs.promises.readFile(this.path, "utf-8")
@@ -19,11 +19,11 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         return datosArchivo
     }
     
-    async save() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
+    async saveOne() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
         let datosArchivo = await this.getAll()
         const newContenedor = {
             timestamp: Date.now(),
-            contenedor: [] // ENTREGA "Webpack: Module Bundler" DE BACKEND: En este trabajo el contenedor representa a un carrito, pero no lo nombro como tal porque trato de crear el código de la manera más general posible
+            contenedor: [] // En este trabajo el contenedor representa a un carrito, pero no lo nombro como tal porque trato de crear el código de la manera más general posible
         }
         if (datosArchivo.length === 0) {
             newContenedor.id = 1 // Queremos que el primer contenedor a agregar tenga id igual a 1
@@ -39,15 +39,18 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
     }
     
     async getById(id) { // Recibe un id y devuelve el objeto con ese id, o null si no está
+        id = parseInt(id)
         const datosArchivo = await this.getAll()
         return datosArchivo.some(objeto => objeto.id === id) ? datosArchivo.find(contenedor => contenedor.id === id) : null
     }
 
-    async saveContainerInContainer(idContGrande, idContChico) { // Guarda el id de un contendor dentro de otro. La propiedad quantity nos especifica cuantas veces el contenedor de adentro (que denomino "chico") está en el de afuera. Necesitamos el id de ambos para poder referenciarlos
+    async saveContainerInContainer(idContGrande, idContChico) { // Guarda el id de un contendor dentro de otro. La propiedad quantity nos especifica cuántas veces el contenedor de adentro (que denomino "chico") está en el de afuera. Necesitamos el id de ambos para poder referenciarlos
+        idContGrande = parseInt(idContGrande)
+        idContChico = parseInt(idContChico)
         const datosArchivo = await this.getAll();
-        let productos = datosArchivo.find(elemento => elemento.id == idContGrande).contenedor // Accede al contenedor de contenedores que me interesa
+        let productos = datosArchivo.find(elemento => elemento.id === idContGrande).contenedor // Accede al contenedor de contenedores que me interesa
 
-        if (productos.some(producto => producto.id == idContChico)) { // Si el contenedor pequeño ya estaba dentro del grande, le suma la cantidad
+        if (productos.some(producto => producto.id === idContChico)) { // Si el contenedor pequeño ya estaba dentro del grande, le suma la cantidad
             productos = productos.map(prod => {
                 if (prod.id === idContChico){
                     prod.quantity++
@@ -63,7 +66,8 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         await fs.promises.writeFile(this.path, JSON.stringify(datosArchivo, null, "\t"));
     }
 
-    async deleteById(id) { // Vacía del archivo al contenedor con el id solicitado
+    async deleteById(id) { // Vacía del archivo al contenedor grande con el id solicitado
+        id = parseInt(id)
         let datosArchivo = await this.getAll()
         let newDatosArchivo = datosArchivo.map(objeto => {
             if (objeto.id === id) {
@@ -75,7 +79,9 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         await fs.promises.writeFile(this.path, newDatosArchivo)
     }
 
-    async deleteContainerInContainer (idContGrande, idContChico) { // Elimina un contenedor dentro de otro contenedor gracias a sus ids
+    async deleteContainerInContainer(idContGrande, idContChico) { // Elimina un contenedor dentro de otro contenedor gracias a sus ids
+        idContGrande = parseInt(idContGrande)
+        idContChico = parseInt(idContChico)
         let contenedorChicoBorrado = false
         const datosArchivo = await this.getAll();
         let newDatosArchivo = datosArchivo.map( objeto => { // Modifica únicamente al contenedor de contenedores solicitado según su id

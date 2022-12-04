@@ -1,5 +1,5 @@
-import { Router } from "express"; 
-import Contenedor from "../Managers/Contenedor.js";
+import { Router } from "express";
+import { Contenedor } from "../daos/index.js";
 
 const router = Router(); // Inicializamos el router
 
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => { // En /api/products devuelve todos los pro
 
 router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el producto con id n, siempre y cuando exista
     const { pid } = req.params
-    const result = await contenedor.getById(parseInt(pid))
+    const result = await contenedor.getById(pid)
     if (result === null) {
         res.send({ error: "Product not found"})
     } else {
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => { // Agrega un producto al archivo gracias 
             price: parseFloat(price),
             stock
         }
-        const result = await contenedor.save(producto)
+        const result = await contenedor.saveOne(producto)
         res.send({ status: "sucess", message: "Product added", idProduct: result })
     }
 })
@@ -88,7 +88,7 @@ router.delete("/:pid", async (req, res) => { // Elimina un producto según su id
     const datosArchivo = await contenedor.getAll()
     
     if (datosArchivo.some(objeto => objeto.id == pid)) { // Primero verifica si el producto con ese id está en el archivo
-        await contenedor.deleteById(parseInt(pid))
+        await contenedor.deleteById(pid)
         res.send({ status: "sucess", message: `Producto con id ${pid} eliminado` })
     } else {
         res.send({ error: "Product not found" })

@@ -3,7 +3,7 @@
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
 import __dirname from "./utils.js";
-import Contenedor from "./Managers/Contenedor.js";
+import { Contenedor } from "./daos/index.js";
 import carritoRouter from "./routes/carrito.routes.js"
 import { Server } from "socket.io";
 import chatRouter from "./routes/views.chat.routes.js"
@@ -52,7 +52,7 @@ io.on("connection", async socket => {
     socket.on("message", data => { // Recibo los datos emitidos en chat.js
         mensajes.push(data)
         io.emit("enviarMensajes", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-        contenedorHistorialChats.save( data ).then(res => res)
+        contenedorHistorialChats.saveOne( data ).then(res => res)
         //! Gracias a esta última línea el chat no puede funcionar correctamente mientras desarrollemos con nodemon, ya que al guardar el objeto estaríamos actualizando el código y nodemon lo ejecutaría de nuevo, provocando que los sockets se reinicien y el chat se borre del DOM. Si bien se recupera el chat gracias al historial, dejará de funcionar (junto con el chat) si se envían muchos mensajes muy rápido
     })
 

@@ -27,7 +27,7 @@ class Contenedor {
         return datosArchivo
     }
        
-    async save(objeto) { // Recibe un objeto, lo guarda en el archivo, le coloca un id único y devuelve ese id
+    async saveOne(objeto) { // Recibe un objeto, lo guarda en el archivo, le coloca un id único y devuelve ese id
         let datosArchivo = await this.getAll()
         if (datosArchivo.length === 0) { // El propósito de este if-else es asegurar que el id agregado es único en el array
             objeto.id = 1 // Queremos que el primer objeto a agregar tenga id igual a 1
@@ -45,13 +45,16 @@ class Contenedor {
     }
 
     async getById(id) { // Recibe un id y devuelve el objeto con ese id, o null si no está
+        id = parseInt(id)
+        console.log(id)
         const datosArchivo = await this.getAll()
         return datosArchivo.some(objeto => objeto.id === id) ? datosArchivo.find(objeto => objeto.id === id) : null
     }
 
-    async deleteById(id) { // Elimina del archivo el objeto con el id buscado
+    async deleteById(id) { // Elimina del archivo al objeto con el id solicitado
+        id = parseInt(id)
         let datosArchivo = await this.getAll()
-        datosArchivo = datosArchivo.filter(objeto => objeto.id != id)
+        datosArchivo = datosArchivo.filter(objeto => objeto.id !== id)
         datosArchivo = JSON.stringify(datosArchivo, null, "\t")
         await fs.promises.writeFile(this.path, datosArchivo)
     }
@@ -62,11 +65,11 @@ class Contenedor {
         }
     }
 
-    async update(objetoActualizado, id) { // Actualiza un objeto en el archivo según su id (reemplaza el anterior por el nuevo)
+    async update(objetoActualizado, id) { // Actualiza un objeto en el archivo según su id (reemplaza al anterior por el nuevo)
         let datosArchivo = await this.getAll()
         const indiceObjeto = datosArchivo.findIndex(objeto => objeto.id == id)
         objetoActualizado.id = parseInt(id)
-        objetoActualizado.code = datosArchivo.find(objeto => objeto.id == id).code // La propiedad code debe ser la misma que antes ya que es un identificador, al igual que el id
+        objetoActualizado.code = datosArchivo[indiceObjeto].code // La propiedad code debe ser la misma que antes ya que es un identificador, al igual que el id
         datosArchivo[indiceObjeto] = objetoActualizado
         datosArchivo = JSON.stringify(datosArchivo, null, "\t")
         await fs.promises.writeFile(this.path, datosArchivo)

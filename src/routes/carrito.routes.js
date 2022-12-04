@@ -1,11 +1,10 @@
 import { Router } from "express"; 
-import ContenedorCarrito from "../Managers/ContenedorDeContenedores.js";
-import ContenedorProductos from "../Managers/Contenedor.js"
+import { Contenedor, ContenedorDeContenedores } from "../daos/index.js";
 
 const router = Router();
 
-const contenedorCarrito = new ContenedorCarrito("carritos");
-const contenedorProductos = new ContenedorProductos("productos")
+const contenedorCarrito = new ContenedorDeContenedores("carritos");
+const contenedorProductos = new Contenedor("productos")
 
 router.get("/", async (req, res) => { // En /api/cart devuelve todos los carritos disponibles
     const result = await contenedorCarrito.getAll()
@@ -14,7 +13,7 @@ router.get("/", async (req, res) => { // En /api/cart devuelve todos los carrito
 
 router.get("/:cid/products", async (req, res) => { // En /api/cart/n/products devuelve el carrito con id n, siempre y cuando exista
     const { cid } = req.params
-    const result = await contenedorCarrito.getById(parseInt(cid))
+    const result = await contenedorCarrito.getById(cid)
     if (result === null) {
         res.send({ error: "Cart not found"})
     } else {
@@ -23,14 +22,12 @@ router.get("/:cid/products", async (req, res) => { // En /api/cart/n/products de
 })
 
 router.post("/", async (req, res) => { // Agrega una colección (que representa a un carrito) al archivo gracias a Postman. Devuelve su id asignado
-    const result = await contenedorCarrito.save()
+    const result = await contenedorCarrito.saveOne()
     res.send({ status: "sucess", message: "Cart added", idProduct: result })
 })
 
 router.post("/:cid/products/:pid", async (req, res) => { // Agrega un producto particular en un carrito en particular
     let { cid, pid } = req.params;
-    cid = parseInt(cid)
-    pid = parseInt(pid)
 
     const carritoId = await contenedorCarrito.getById(cid)
     const productoId = await contenedorProductos.getById(pid)
@@ -49,10 +46,9 @@ router.post("/:cid/products/:pid", async (req, res) => { // Agrega un producto p
 
 router.delete("/:cid", async (req, res) => { // Vacía un carrito según su id
     let { cid } = req.params
-    cid = parseInt(cid)
     const datosArchivo = await contenedorCarrito.getAll()
     
-    if (datosArchivo.some(carrito => carrito.id === cid)) { // Primero verifica si el carrito con ese id está en el archivo
+    if (datosArchivo.some(carrito => carrito.id == cid)) { // Primero verifica si el carrito con ese id está en el archivo
         await contenedorCarrito.deleteById(cid)
         res.send({ status: "sucess", message: `Carrito con id ${cid} vaciado` })
     } else {
@@ -62,8 +58,6 @@ router.delete("/:cid", async (req, res) => { // Vacía un carrito según su id
 
 router.delete("/:cid/products/:pid", async (req, res) => { // Vacía un carrito según su id
     let { cid, pid } = req.params;
-    cid = parseInt(cid)
-    pid = parseInt(pid)
 
     const carritoId = await contenedorCarrito.getById(cid)
     
