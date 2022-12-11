@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Contenedor } from "../daos/index.js";
+import { generateProduct } from "../utils/mocks.js"
 
 const router = Router(); // Inicializamos el router
 
@@ -12,6 +13,15 @@ router.get("/", async (req, res) => { // En /api/products devuelve todos los pro
     res.send({ status: "success", payload: result })
 })
 
+router.get("/test", (req, res) => { // En /api/products/test devuelve cinco productos al azar
+    let products = []
+    for (let i=0; i<5; i++) {
+        products.push(generateProduct())
+    }
+    res.render("test", { products })
+    // res.send({ status: "success", payload: products }) // Utilizar este res (y comentar el de arriba) para enviar los productos y verlos luego con Thunder Client
+})
+
 router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el producto con id n, siempre y cuando exista
     const { pid } = req.params
     const result = await contenedor.getById(pid)
@@ -19,7 +29,7 @@ router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el prod
         res.send({ error: "Product not found"})
     } else {
         res.send({ status: "success", payload: result })
-    }   
+    }
 })
 
 router.post("/", async (req, res) => { // Agrega un producto al archivo gracias a Postman. Devuelve su id asignado
@@ -40,7 +50,7 @@ router.post("/", async (req, res) => { // Agrega un producto al archivo gracias 
             price: parseFloat(price),
             stock
         }
-        const result = await contenedor.saveOne(producto)
+        const result = await contenedor.save(producto)
         res.send({ status: "sucess", message: "Product added", idProduct: result })
     }
 })

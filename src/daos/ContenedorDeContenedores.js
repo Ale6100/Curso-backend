@@ -19,7 +19,7 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         return datosArchivo
     }
     
-    async saveOne() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
+    async save() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
         let datosArchivo = await this.getAll()
         const newContenedor = {
             timestamp: Date.now(),

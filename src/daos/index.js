@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import key from "../../keys/key.js" // key privada
 
 // Cambiar el valor de la siguiente constante para utilizar el tipo de persistencia de datos deseado
-const PERSISTENCIA = "FILESYSTEM" // Valores posibles: FILESYSTEM y MONGO
+const PERSISTENCIA = "MONGO" // Valores posibles: FILESYSTEM y MONGO
 
 let Contenedor
 let ContenedorDeContenedores
@@ -15,7 +15,7 @@ if (PERSISTENCIA === "FILESYSTEM") { // Según el valor de persistencia, utiliza
     Contenedor = ContenedorFS
     ContenedorDeContenedores = ContenedorDeContenedoresFS
     
-} else { // Me conecto a mi base de datos en MongoDB Cloud (debes crear la tuya si deseas replicar este procedimiento)
+} else if (PERSISTENCIA === "MONGO") { // Me conecto a mi base de datos en MongoDB Cloud (debes crear la tuya si deseas replicar este procedimiento)
     Contenedor = ContenedorMongo
     ContenedorDeContenedores = ContenedorDeContenedoresMongo
     const password = key
@@ -24,6 +24,8 @@ if (PERSISTENCIA === "FILESYSTEM") { // Según el valor de persistencia, utiliza
         if (error) console.log(error);
         else console.log(`Base de mongo conectada. Database: ${database}`)
     })
+} else {
+    new Error("El valor de PERSISTENCIA debe ser FILESYSTEM o MONGO")
 }
 
 export { Contenedor, ContenedorDeContenedores } // Exportamos los contenedores de filesystem o mongo según corresponda

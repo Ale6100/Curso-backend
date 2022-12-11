@@ -22,8 +22,8 @@ router.get("/:cid/products", async (req, res) => { // En /api/cart/n/products de
 })
 
 router.post("/", async (req, res) => { // Agrega una colección (que representa a un carrito) al archivo gracias a Postman. Devuelve su id asignado
-    const result = await contenedorCarrito.saveOne()
-    res.send({ status: "sucess", message: "Cart added", idProduct: result })
+    const result = await contenedorCarrito.save()
+    res.send({ status: "sucess", message: "Cart added", idCart: result })
 })
 
 router.post("/:cid/products/:pid", async (req, res) => { // Agrega un producto particular en un carrito en particular

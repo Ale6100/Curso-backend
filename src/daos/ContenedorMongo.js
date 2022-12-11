@@ -27,12 +27,11 @@ class Contenedor {
         return await this.model.find({})
     }
 
-    async saveOne(document) { // Recibe un documento, lo guarda en la colección, le coloca un id único y devuelve ese id
+    async save(document) { // Recibe un documento, lo guarda en la colección, le coloca un id único y devuelve ese id
         document.timestamp = Date.now()
         document.code = stringAleatorio(10)
-        const documentSaveModel = new this.model(document)
-        const saveOne_ = await documentSaveModel.save()
-        return saveOne_._id.valueOf()
+        const save_ = await this.model.create(document)
+        return save_._id.valueOf()
     }
 
     async getById(id) { // Recibe un id y devuelve el documento con ese id, o null si no está

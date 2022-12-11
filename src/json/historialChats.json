@@ -1,1 +1,16 @@
-[]
+[
+	{
+		"author": {
+			"id": "asd",
+			"nombre": "asd",
+			"apellido": "asd",
+			"edad": "asd",
+			"alias": "asd",
+			"avatar": "asd"
+		},
+		"text": "asd",
+		"id": 1,
+		"timestamp": 1670780316132,
+		"code": "¿aZb9.g9_."
+	}
+]

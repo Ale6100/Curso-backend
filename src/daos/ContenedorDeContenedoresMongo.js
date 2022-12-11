@@ -16,14 +16,13 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
         return await this.model.find({})
     }
 
-    async saveOne() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
+    async save() { // Guarda un contenedor vacío. Le asigna un id único y devuelve ese id
         const newDocument = {
             timestamp: Date.now(),
             contenedor: []
         }
-        const documentSaveModel = new this.model(newDocument)
-        const saveOne_ = await documentSaveModel.save()
-        return saveOne_._id.valueOf()
+        const save_ = await this.model.create(newDocument)
+        return save_._id.valueOf()
     }
 
     async getById(id) { // Recibe un id y devuelve el documento con ese id, o null si no está
@@ -55,6 +54,7 @@ class ContenedorDeContenedores { // El nombre del archivo se pasa como parámetr
     }
 
     async deleteContainerInContainer(idContGrande, idContChico) { // Elimina un contenedor dentro de otro contenedor gracias a sus ids
+        // await this.model.updateOne({_id: idContGrande}, {$set: {contenedor: {$nin: idContChico}}})
         let contenedorChicoBorrado = false
         let document = await this.model.findOne({_id: idContGrande})
         let productos = document.contenedor

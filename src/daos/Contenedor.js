@@ -27,7 +27,7 @@ class Contenedor {
         return datosArchivo
     }
        
-    async saveOne(objeto) { // Recibe un objeto, lo guarda en el archivo, le coloca un id único y devuelve ese id
+    async save(objeto) { // Recibe un objeto, lo guarda en el archivo, le coloca un id único y devuelve ese id
         let datosArchivo = await this.getAll()
         if (datosArchivo.length === 0) { // El propósito de este if-else es asegurar que el id agregado es único en el array
             objeto.id = 1 // Queremos que el primer objeto a agregar tenga id igual a 1
@@ -46,7 +46,6 @@ class Contenedor {
 
     async getById(id) { // Recibe un id y devuelve el objeto con ese id, o null si no está
         id = parseInt(id)
-        console.log(id)
         const datosArchivo = await this.getAll()
         return datosArchivo.some(objeto => objeto.id === id) ? datosArchivo.find(objeto => objeto.id === id) : null
     }
