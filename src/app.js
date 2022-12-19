@@ -8,6 +8,12 @@ import carritoRouter from "./routes/carrito.routes.js"
 import { Server } from "socket.io";
 import chatRouter from "./routes/views.chat.routes.js"
 import { normalize, schema } from "normalizr";
+import formUsersRouter from "./routes/views.formUsers.routes.js"
+import sessionsRouter from "./routes/sessions.routes.js"
+
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import key from "../keys/key.js"
 
 const app = express();
 
@@ -22,19 +28,38 @@ app.set("views", `${__dirname}/views`); // Ubicación de las vistas
 app.set("view engine", "ejs"); // Configuramos EJS como el motor de visualización de nuestra app
 
 app.use(express.json()); // Especifica que podemos recibir json
-app.use(express.urlencoded({ extended:true })); // Habilita poder procesar y parsear datos más complejos en la url
+app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y parsear datos más complejos en la url
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
 app.use("/api/cart", carritoRouter)
+app.use("/api/sessions", sessionsRouter)
 app.use("/chat", chatRouter) // Ruta donde está el chat
+app.use("/formUsers", formUsersRouter)
 
 const contenedorProductos = new Contenedor("productos")
 
+const password = key
+const database = "dbSession" // Si no existe, la crea
+
+app.use(session({
+    store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
+        mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
+        ttl: 60
+    }),
+    secret: "asd",
+    resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
+    saveUninitialized: false
+}))
+
 app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
-    const arrayProductos = await contenedorProductos.getAll()
-    res.render("index", { arrayProductos })
+    if (req.session.user === undefined) {
+        res.render("formLogin")
+    } else {
+        const arrayProductos = await contenedorProductos.getAll()
+        res.render("index", { arrayProductos, usuario: req.session.user })
+    }
 })
 
 const nomalizarMensajes = (objetoContenedorMensajes) => { // Normaliza el objeto que paso como parámetro (sólo sirve para este objeto)
@@ -70,7 +95,7 @@ const quitarNewObjetId = (arrayChat) => { // Aparentemente no se puede normaliza
 
 const contenedorHistorialChats = new Contenedor("historialChats")
 
-app.get("/api/messages/normalizr", async (req, res) => { // Originalmente esta ruta devuelve un array vacío ya que no se normalizó nada
+app.get("/api/messages/normalizr", async (req, res) => {
     let arrayChat = await contenedorHistorialChats.getAll()
     arrayChat = quitarNewObjetId(arrayChat)
     const mensajesNormalizados = nomalizarMensajes({ id: "mensajes", mensajes: arrayChat })
@@ -99,10 +124,6 @@ io.on("connection", async socket => {
 
         io.emit("enviarMensajes", mensajesNormalizados) // Versión nueva
         // io.emit("enviarMensajes", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-    
-        app.get("/api/messages/normalizr", (req, res) => { // Envío a esta ruta los mensajes normalizados
-            res.send({ status: "sucess", payload: mensajesNormalizados[0] })
-        })
     })
 
     socket.on("autenticado", alias => {

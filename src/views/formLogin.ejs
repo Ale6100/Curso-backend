@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <title>Loguearse</title>
+</head>
+<body>
+    <%- include("./partials/navBar") %> 
+
+    <main>
+        <h1>Formulario de logueo de usuario</h1>
+        <form id="formLoginUsuario">    
+            <Label>Email
+                <input type="email" name="email" required>
+            </Label>
+        
+            <Label>Contraseña
+                <input type="password" name="password" required>
+            </Label>
+        
+            <button type="submit">Loguearse</button>
+        </form>
+    
+        <p>Si no estás registrado, <a href="../formUsers">regístrate</a></p>
+    </main>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../js/login.js"></script>
+</body>
+</html>

@@ -19,11 +19,11 @@ router.use(session({
 }))
 
 router.get("/", (req, res) => {
-    if (req.session.user === undefined) {
-        res.render("formLogin")
-    } else {
-        res.render("chat", { usuario: req.session.user });
-    }
+    res.render("formUsers")
+})
+
+router.get("/login", (req, res) => {
+    res.render("formLogin")
 })
 
 export default router

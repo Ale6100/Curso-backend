@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://img.icons8.com/color/48/null/backend-development--v1.png" type="image/x-icon">
     <link rel="stylesheet" href="./css/style.css"> <!-- Los estilos están en public/css/style.css -->
     <title>Inicio</title>
 </head>
 <body>
+    <%- include("./partials/navBar") %> 
     <main>
+        <h2>Bienvenido <%= usuario.first_name %> <%= usuario.last_name %>   </h2>
+        <%- include("./partials/buttonLogout") %> 
         <%- include("./partials/formulario") %>
         <%- include("./partials/productosCargados") %>
-        <a href="/chat">Ir a la sala de chat</a>
     </main>
 </body>
 </html>

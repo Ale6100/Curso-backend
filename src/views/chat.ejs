@@ -10,21 +10,14 @@
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li>
-                    <a href="/">Ir a la página principal</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    <%- include("./partials/navBar") %> 
 
     <main>
         <div>
             <p id="noTerminado">Comentario para los desarrolladores curiosos: Para que este chat funcione no deben usar nodemon</p>
             <h1>Sala de chat</h1>
-            
+            <h2>Bienvenido <%= usuario.first_name %> <%= usuario.last_name %> </h2>
+            <%- include("./partials/buttonLogout") %>
             <div class="contenedor-chat">
                 <input id="chatBox" type="text" placeholder="Escribe tu mensaje...">
                 <textarea id="logsPanel" placeholder="Chat en mantenimiento, no se verán tus mensajes :(" readonly></textarea>
