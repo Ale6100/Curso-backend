@@ -4,11 +4,11 @@ const collection = "carritos"
 const shema = new mongoose.Schema({
     timestamp: {
         type: Number,
-        require: true
+        required: true
     },
     contenedor: {
         type: Array,
-        require: true
+        required: true
     }
 })
 

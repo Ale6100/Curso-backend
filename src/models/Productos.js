@@ -4,31 +4,31 @@ const collection = 'productos'; // Nombre de la colección a manipular
 const schema = new mongoose.Schema({ // Estructura que tendrá cada documento
     title: {
         type: String,
-        require: true
+        required: true
     },
     description: {
         type: String,
-        require: true
+        required: true
     },
     price: {
         type: Number,
-        require: true
+        required: true
     },
     image: {
         type: String,
-        require: true
+        required: true
     },
     stock: {
         type: Number,
-        require: true
+        required: true
     },
     timestamp: {
         type: Number,
-        require: true
+        required: true
     },
     code: {
         type: String,
-        require: true
+        required: true
     }
 })
 

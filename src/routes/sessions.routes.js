@@ -2,67 +2,68 @@ import { Router } from "express";
 import userModel from "../models/User.js"
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import key from "../../keys/key.js"
+import { passMongo } from "../../keys/key.js"
+import { createHash, validatePassword } from "../utils.js";
+import passport from "passport";
 
 const router = Router();
 
-const password = key
+const password = passMongo
 const database = "dbSession" // Si no existe, la crea
 
 router.use(session({ 
     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
         mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
-        ttl: 60
+        ttl: 60*60*24*7
     }),
     secret: "asd",
     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
     saveUninitialized: false
 }))
 
-router.post("/register", async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
-    if (!first_name || !last_name || !email || !password) return res.status(400).send({ status: "error", error: "Incomplete values" })
-    
-    const user = await userModel.findOne({ email })
-
-    if (user !== null) return res.status(400).send({ status: "error", error: "El email ya existe en nuestra base de datos" })
-
-    const usuario = {
-        first_name,
-        last_name,
-        email,
-        password
-    }
-
-    const result = await userModel.create(usuario)
-    
-    res.status(400).send({ status: "success", message: `Usuario con mail ${usuario.email} e id ${result.id} guardado` })
+// passport.authenticate("register") // Para indicarle que queremos usar la estrategia register
+router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/failedRegister" }), async (req, res) => {
+    const user = req.user; // Es lo que enviamos en el done de passport.config
+    res.status(400).send({ status: "success", message: `Usuario registrado. Id: ${user.id} guardado` })
 })
 
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+router.get("/failedRegister", (req, res) => { // Página que muestra un mensaje si salió un error imprevisto en el registro con passport
+    res.status(500).send({ status: "error", error: "Error de passport a la hora de registrarte" })
+})
 
-    if (!email || !password) return res.status(400).send({ status: "error", error: "Incomplete values" })
-    
-    const usuario = await userModel.findOne({ email, password })
-
-    if (usuario === null) return res.status(400).send({ status: "error", error: "Email o contraseña incorrectos" })
-
+router.post("/login", passport.authenticate("login", { failureRedirect: "/api/sessions/failedLogin" }), async (req, res) => {
     req.session.user = {
-        first_name: usuario.first_name,
-        last_name: usuario.last_name,
-        email: usuario.email,
-        role: usuario.role
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        email: req.user.email,
+        role: req.user.role
     }
 
-    res.status(400).send({ status: "success", message: `Usuario con email ${usuario.email} logueado!` })
+    res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 })
+
+router.get("/failedLogin", (req, res) => { // Página que muestra un mensaje si salió un error imprevisto en el logueo con passport
+    res.status(500).send({ status: "error", error: "Error de passport a la hora de loguearse" })
+})
+
 
 router.get("/logout", async (req, res) => {
     req.session.destroy(err=>{
         if (err) return res.status(500).send("No se pudo cerrar sesión")
     })
     return res.send({ status: "success", message: "Deslogueado" })
+})
+
+router.get("/github", passport.authenticate("github"), (req, res) => {}) // Abre gitHub y solicita los datos (está conectado con el botón del html)
+
+router.get("/githubcallback", passport.authenticate("github"), (req, res) => { // Toma los datos de github e inicia sesión
+    console.log(req.user)
+    req.session.user = {
+        name: `${req.user.first_name}`,
+        email: req.user.email,
+        role: req.user.role
+    }
+    res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 })
 
 router.get("/user", async (req, res) => {

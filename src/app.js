@@ -10,10 +10,12 @@ import chatRouter from "./routes/views.chat.routes.js"
 import { normalize, schema } from "normalizr";
 import formUsersRouter from "./routes/views.formUsers.routes.js"
 import sessionsRouter from "./routes/sessions.routes.js"
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
 
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import key from "../keys/key.js"
+import { passMongo } from "../keys/key.js"
 
 const app = express();
 
@@ -40,25 +42,38 @@ app.use("/formUsers", formUsersRouter)
 
 const contenedorProductos = new Contenedor("productos")
 
-const password = key
+const password = passMongo
 const database = "dbSession" // Si no existe, la crea
 
 app.use(session({
     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
         mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
-        ttl: 60
+        ttl: 60*60*24*7*60*24*7 // El time to live lo dejo en 7 días
     }),
     secret: "asd",
     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
     saveUninitialized: false
 }))
 
-app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
+initializePassport(); // Inicializamos las estrategias de passport. Genera las estrategias a utilizar
+app.use(passport.initialize()); // Genera el corazón de passport
+app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
+
+app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos)
     if (req.session.user === undefined) {
         res.render("formLogin")
     } else {
         const arrayProductos = await contenedorProductos.getAll()
         res.render("index", { arrayProductos, usuario: req.session.user })
+    }
+})
+
+app.get("/profile", async (req, res) => {
+    const usuario = req.session.user
+    if (usuario) {
+        res.render("profile", { usuario })
+    } else {
+        res.status(401).send({ status: "error", error: "No authenticated" })
     }
 })
 

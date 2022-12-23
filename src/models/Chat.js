@@ -5,32 +5,32 @@ const schema = new mongoose.Schema({ // Estructura que tendrá cada documento
     author: {
         id: { // El "id" en realidad va a ser el mail. Entiendo que Mongo ya proporciona un id, pero según entendí en el ejercicio pide que hagamos esto
             type: String,
-            require: true
+            required: true
         },
         nombre: {
             type: String,
-            require: true
+            required: true
         },
         apellido: {
             type: String,
-            require: true
+            required: true
         },
         edad: {
             type: String,
-            require: true
+            required: true
         },
         alias: {
             type: String,
-            require: true
+            required: true
         },
         avatar: {
             type: String,
-            require: true
+            required: true
         }
     },
     text: {
         type: String,
-        require: true
+        required: true
     }
 })
 

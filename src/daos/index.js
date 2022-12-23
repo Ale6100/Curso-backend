@@ -3,7 +3,7 @@ import ContenedorDeContenedoresFS from "./ContenedorDeContenedores.js"
 import ContenedorMongo from "./ContenedorMongo.js"
 import ContenedorDeContenedoresMongo from "./ContenedorDeContenedoresMongo.js";
 import mongoose from 'mongoose';
-import key from "../../keys/key.js" // key privada
+import { passMongo } from "../../keys/key.js" // key privada
 
 // Cambiar el valor de la siguiente constante para utilizar el tipo de persistencia de datos deseado
 const PERSISTENCIA = "MONGO" // Valores posibles: FILESYSTEM y MONGO
@@ -18,7 +18,7 @@ if (PERSISTENCIA === "FILESYSTEM") { // Según el valor de persistencia, utiliza
 } else if (PERSISTENCIA === "MONGO") { // Me conecto a mi base de datos en MongoDB Cloud (debes crear la tuya si deseas replicar este procedimiento)
     Contenedor = ContenedorMongo
     ContenedorDeContenedores = ContenedorDeContenedoresMongo
-    const password = key
+    const password = passMongo
     const database = "backend" // Si no existe, la crea
     const connection = mongoose.connect(`mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`, error => {
         if (error) console.log(error);

@@ -4,33 +4,23 @@ const collection = 'users'; // Nombre de la colección a manipular
 const schema = new mongoose.Schema({ // Estructura que tendrá cada documento
     first_name: {
         type: String,
-        require: true
+        required: true
     },
     last_name: {
-        type: String,
-        require: true
+        type: String
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     role: {
         type: String,
-        require: true,
+        required: true,
         default: "user"
     },
     password: {
-        type: Number,
-        require: true
-    },
-    timestamp: {
-        type: Number,
-        require: true
-    },
-    code: {
-        type: String,
-        require: true
+        type: String
     }
 })
 
