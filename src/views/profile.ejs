@@ -7,6 +7,7 @@
     <title>Perfil</title>
 </head>
 <body>
+    <%- include("./partials/navBar") %> 
     <h1>Perfil</h1>
     <% if (usuario.name) { %> <!-- Hago esto sabiendo que cuando me logueo por GitHub, el nombre se guarda en name. Pero sino, se separa en first_name y last_name -->
         <p>Nombre: <%= usuario.name %></p>

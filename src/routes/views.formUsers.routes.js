@@ -1,11 +1,11 @@
 import { Router } from "express";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import { passMongo } from "../../keys/key.js"
+import config from "../config/config.js";
 
 const router = Router();
 
-const password = passMongo
+const password = config.mongo.password
 const database = "dbSession" // Si no existe, la crea
 
 router.use(session({

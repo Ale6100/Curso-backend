@@ -12,10 +12,11 @@ import formUsersRouter from "./routes/views.formUsers.routes.js"
 import sessionsRouter from "./routes/sessions.routes.js"
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+import randomsRouter from "./routes/randoms.routes.js"
 
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import { passMongo } from "../keys/key.js"
+import config from "./config/config.js";
 
 const app = express();
 
@@ -37,18 +38,19 @@ app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de arc
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
 app.use("/api/cart", carritoRouter)
 app.use("/api/sessions", sessionsRouter)
+app.use("/api/randoms", randomsRouter)
 app.use("/chat", chatRouter) // Ruta donde está el chat
 app.use("/formUsers", formUsersRouter)
 
 const contenedorProductos = new Contenedor("productos")
 
-const password = passMongo
+const password = config.mongo.password
 const database = "dbSession" // Si no existe, la crea
 
 app.use(session({
     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
         mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
-        ttl: 60*60*24*7*60*24*7 // El time to live lo dejo en 7 días
+        ttl: 60*60*24*7 // El time to live lo dejo en 7 días
     }),
     secret: "asd",
     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
@@ -60,11 +62,12 @@ app.use(passport.initialize()); // Genera el corazón de passport
 app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
 app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos)
-    if (req.session.user === undefined) {
+    const usuario = req.session.user
+    if (usuario === undefined) {
         res.render("formLogin")
     } else {
         const arrayProductos = await contenedorProductos.getAll()
-        res.render("index", { arrayProductos, usuario: req.session.user })
+        res.render("index", { arrayProductos, usuario })
     }
 })
 
@@ -75,6 +78,19 @@ app.get("/profile", async (req, res) => {
     } else {
         res.status(401).send({ status: "error", error: "No authenticated" })
     }
+})
+
+app.get("/info", async (req, res) => {
+    const info = {
+        argumentosEntrada: process.argv.slice(2),
+        sistemaOperativo: process.platform,
+        versionNode: process.version,
+        memoriaTotalReservada: process.memoryUsage(),
+        pathEjecucion: __dirname,
+        processId: process.pid,
+        carpetaProyecto: process.cwd()
+    }
+    res.render("info", { info })
 })
 
 const nomalizarMensajes = (objetoContenedorMensajes) => { // Normaliza el objeto que paso como parámetro (sólo sirve para este objeto)
@@ -121,7 +137,7 @@ app.get("/api/messages/normalizr", async (req, res) => {
 //      mensajes = response
 // })
 
-//! Sólo por ahora, el chat funciona sólo con mongo, ya no con filesystem
+//! Por ahora el chat funciona sólo con mongo, ya no con filesystem
 
 io.on("connection", async socket => {
     // Hago que se envíe el array actualizado de productos a todos los sockets cada vez que se conecta un socket (recordemos que al enviar el formulario el usuario va a una ruta y vuelve a la principal rápidamente. En ese caso es como si se hubiera conectado un nuevo socket, lo que provocaría que esta función se ejecute)

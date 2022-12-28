@@ -2,13 +2,13 @@ import { Router } from "express";
 import userModel from "../models/User.js"
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import { passMongo } from "../../keys/key.js"
+import config from "../config/config.js";
 import { createHash, validatePassword } from "../utils.js";
 import passport from "passport";
 
 const router = Router();
 
-const password = passMongo
+const password = config.mongo.password
 const database = "dbSession" // Si no existe, la crea
 
 router.use(session({ 
@@ -57,7 +57,6 @@ router.get("/logout", async (req, res) => {
 router.get("/github", passport.authenticate("github"), (req, res) => {}) // Abre gitHub y solicita los datos (está conectado con el botón del html)
 
 router.get("/githubcallback", passport.authenticate("github"), (req, res) => { // Toma los datos de github e inicia sesión
-    console.log(req.user)
     req.session.user = {
         name: `${req.user.first_name}`,
         email: req.user.email,
