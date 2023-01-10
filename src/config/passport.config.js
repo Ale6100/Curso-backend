@@ -41,9 +41,9 @@ const initializePassport = () => { // Le sirve al corazón principal para poder 
     }, async (email, password, done) => {
         try {            
             const usuario = await userModel.findOne({ email })
-        
+            
             if (usuario === null) return done(null, false, {message:  "Email no encontrado"})
-        
+            
             const isValidPassword = await validatePassword(usuario, password)
             if (!isValidPassword) return done(null, false, {message:  "Invalid password"})
         

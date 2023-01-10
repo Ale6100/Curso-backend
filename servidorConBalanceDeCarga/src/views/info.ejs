@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info proceso</title>
+</head>
+<body>
+    <%- include("./partials/navBar") %> 
+    <h1>Información del proceso actual</h1>
+    <div>
+        <% if (info.argumentosEntrada.length !== 0) { %>
+            <p>Argumentos de entrada: <%= info.argumentosEntrada %></p>
+        <% } else {%>
+            <p>Argumentos de entrada: ninguno</p>
+        <% }  %>
+
+        <p>Sistema operativo: <%= info.sistemaOperativo %> </p>
+        
+        <p>Versión de NodeJs: <%= info.versionNode %> </p>
+
+        <p>Memoria total reservada (rss): <%= JSON.stringify(info.memoriaTotalReservada) %> </p>
+            
+        <p>Path de ejecución: <%= info.pathEjecucion %> </p>
+
+        <p>Process ID: <%= info.processId %> </p>
+
+        <p>Carpeta del proyecto: <%= info.carpetaProyecto %> </p>
+
+        <p>Cantidad de procesadores presentes en el servidor: <%= info.cantProcesadores %> </p>
+    </div>
+</body>
+</html>

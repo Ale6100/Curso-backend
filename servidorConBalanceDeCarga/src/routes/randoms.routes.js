@@ -1,3 +1,6 @@
+import { Router } from "express";
+import __dirname from "../utils.js";
+
 const numeroAlAzar = (num1, num2) => { // Recibe dos números `num1` y `num2`. Devuelve un número al azar entre ellos (no incluye al `num2`)
     const randomAmpliado = Math.random()*(Math.abs(num2-num1)) //  Número al azar entre 0 y |num2-num1| (este último sin incluir)
     const numeroMasChico = num1 < num2 ? num1 : num2
@@ -17,7 +20,18 @@ const numerosAleatorios = (objeto, n=100000000) => { // Construye un objeto que 
     return objeto
 }
 
-process.on("message", data => { // Ejecuta estas líneas de código en un proceso hijo, ya que requiere mucho esfuerzo computacional
-    const { objeto, cant } = data
-    process.send(numerosAleatorios(objeto, cant)) // Cuando la info ya está lista, se envía al proceso padre
+const router = Router();
+
+router.get("/", (req, res) => {
+    console.log(`api/random: Proceso ${process.pid}`);
+    const { cant } = req.query
+
+    const objeto = {}
+    for (let i=1; i<=1000; i++) { // Construyo un objeto cuyas claves van del 1 al 1000, y sus valores son todos 0
+        objeto[i] = 0
+    }
+
+    res.send({ status: "sucess", pid:process.pid, payload: numerosAleatorios(objeto, cant)})
 })
+
+export default router
