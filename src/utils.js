@@ -14,4 +14,10 @@ export const validatePassword = (user, password) => { // Devuelve true si coloca
     return bcrypt.compare(password, user.password) // Compara la contraseña en el formulario de logueo contra la contraseña hasheada
 }
 
+export const infoPeticion = (req, res, next) => { // Esto luego en app.js se setea como middleware que guarda en infoPeticion informacion relevante para usar en los loggers
+    const fecha = new Date().toLocaleDateString('es', { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})
+    req.infoPeticion = `${fecha} | Petición a la ruta '${req.url}' | Método ${req.method}`
+    next()
+}
+
 export default __dirname;

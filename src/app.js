@@ -2,7 +2,7 @@
 
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
-import __dirname from "./utils.js";
+import __dirname, { infoPeticion } from "./utils.js";
 import { Contenedor } from "./daos/index.js";
 import carritoRouter from "./routes/carrito.routes.js"
 import { Server } from "socket.io";
@@ -13,17 +13,55 @@ import sessionsRouter from "./routes/sessions.routes.js"
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import randomsRouter from "./routes/randoms.routes.js"
-
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import config from "./config/config.js";
+import { addLogger, logger } from "./utils/logger.js";
+import os from "os"
+import parseArgs from "minimist";
+import cluster from "cluster"
 
 const app = express();
 
-const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no tenga
-const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`));
+const CPUs = os.cpus().length;
 
-server.on("error", error => console.log(error)); // En caso de que haya un error en la puesta en marcha del servidor
+const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no tenga
+
+const args = parseArgs(process.argv.slice(2), { default: { mode: "FORK" } }) // Valores posibles: CLUSTER y FORK
+
+console.log("Argumentos:", args)
+
+let server
+if (args.mode === "CLUSTER") {
+    if (cluster.isPrimary) { // Si nos encontramos en el proceso primario
+        console.log(`Ejecutando el servidor en modo ${args.mode}`)
+        console.log(`Proceso primario con pid ${process.pid} ejecutándose`);
+        
+        for (let i = 0; i < CPUs; i++) { // Genera CPUs procesos hijos (o "workers") y vuelve a correr el archivo actual, entrando en el else. La cantidad depende de la computadora
+            cluster.fork();
+        }
+        
+        cluster.on('exit', (worker) => {
+            console.log(`El proceso ${worker.process.pid} finalizó`)
+            cluster.fork();  // Cuando un proceso hijo termina, inicia otro
+        })
+    } else {
+        console.log(`Proceso worker con PID ${process.pid} ejecutándose`)
+        server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
+        server.on("error", error => logger.error(`${error}`))
+    }
+
+} else if (args.mode === "FORK") {
+    console.log(`Ejecutando el servidor en modo ${args.mode}`)
+    server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
+    server.on("error", error => logger.error(`${error}`))
+
+} else {
+    const error = "Debes pasar un argumento válido en la terminal indicando si deseas iniciar el servidor en modo FORK o CLUSTER. Ejemplo: node src/app.js --mode CLUSTER"
+    logger.error(`${error}`)
+    setTimeout(() => {throw new Error(`${error}`)}, 1000); // Para que el logger funcione necesito ejecutar el error un poco después
+    
+}
 
 const io = new Server(server) // io va a ser el servidor del socket. Va a estar conectado con nuestro servidor actual
 
@@ -34,6 +72,9 @@ app.use(express.json()); // Especifica que podemos recibir json
 app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y parsear datos más complejos en la url
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
+
+app.use(infoPeticion)
+app.use(addLogger)
 
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
 app.use("/api/cart", carritoRouter)
@@ -76,6 +117,7 @@ app.get("/profile", async (req, res) => {
     if (usuario) {
         res.render("profile", { usuario })
     } else {
+        req.logger.error(`${req.infoPeticion} | Se trató de visitar sin estar autenticado`)
         res.status(401).send({ status: "error", error: "No authenticated" })
     }
 })
@@ -91,6 +133,11 @@ app.get("/info", async (req, res) => {
         carpetaProyecto: process.cwd()
     }
     res.render("info", { info })
+})
+
+app.get("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
+    req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
+    res.status(404).send({ status: "error", error: "Error 404; Not Found"})
 })
 
 const nomalizarMensajes = (objetoContenedorMensajes) => { // Normaliza el objeto que paso como parámetro (sólo sirve para este objeto)
@@ -161,3 +208,5 @@ io.on("connection", async socket => {
         socket.broadcast.emit("newUserConnected", alias) // El brodcast hace que se envíe a todos menos al socket (usuario) que desencadena el evento
     })
 })
+
+export { server }

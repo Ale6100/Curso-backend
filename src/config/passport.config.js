@@ -4,6 +4,8 @@ import GithubStrategy from "passport-github2"
 import config from "./config.js"
 import userModel from "../models/User.js"
 import { createHash, validatePassword } from "../utils.js"
+import { server } from "../app.js"
+import parseArgs from "minimist";
 
 const LocalStrategy = local.Strategy // Forma de inicialización que proporciona passport para obtener la estrategia
 
@@ -53,10 +55,12 @@ const initializePassport = () => { // Le sirve al corazón principal para poder 
         }
     }))
 
+    const { dev } = parseArgs(process.argv.slice(2)) // dev va a ser true cuando estemos en modo de desarrollo usando nodemon (cuando se ejecute "npm run dev" en la terminal). Esto está configurado en el package.json
+
     passport.use("github", new GithubStrategy({
         clientID: config.github.clientId,
         clientSecret: config.github.clientSecret,
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback"
+        callbackURL: dev ? `http://localhost:${server.address().port}/api/sessions/githubcallback` : config.site.name
     }, async (accesToken, refreshToken, profile, done) => {
         const { email, name } = profile._json;
         let user = await userModel.findOne({ email })

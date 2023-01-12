@@ -4,6 +4,7 @@ import ContenedorMongo from "./ContenedorMongo.js"
 import ContenedorDeContenedoresMongo from "./ContenedorDeContenedoresMongo.js";
 import mongoose from 'mongoose';
 import config from "../config/config.js";
+import { logger } from "../utils/logger.js";
 
 // Cambiar el valor de la siguiente constante para utilizar el tipo de persistencia de datos deseado
 const PERSISTENCIA = "MONGO" // Valores posibles: FILESYSTEM y MONGO
@@ -20,8 +21,8 @@ if (PERSISTENCIA === "FILESYSTEM") { // Según el valor de persistencia, utiliza
     ContenedorDeContenedores = ContenedorDeContenedoresMongo
     const password = config.mongo.password
     const database = "backend" // Si no existe, la crea
-    const connection = mongoose.connect(`mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`, error => {
-        if (error) console.log(error);
+    mongoose.connect(`mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`, error => {
+        if (error) logger.error(`${error.toString().replaceAll("\"", '\'')}`);
         else console.log(`Base de mongo conectada. Database: ${database}`)
     })
 } else {

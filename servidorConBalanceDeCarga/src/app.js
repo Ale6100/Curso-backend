@@ -2,9 +2,9 @@
 
 import express from "express";
 import __dirname from "./utils.js";
+import os from "os"
 import parseArgs from "minimist";
 import cluster from "cluster"
-import os from "os"
 import randomsRouter from "./routes/randoms.routes.js"
 
 const CPUs = os.cpus().length;
@@ -30,9 +30,9 @@ const args = parseArgs(process.argv.slice(2), {
     }
 })
 
-console.log("Argumentos", args)
+console.log("Argumentos:", args)
 
-app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos
+app.get("/", async (req, res) => {
     res.render("index", { pid: process.pid })
 })
 
@@ -77,7 +77,7 @@ if (args.mode === "CLUSTER") {
     const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
     server.on("error", error => console.log(error))
     
-} else if (args.mode === "pm2") { // Cuando iniciamos con pm2
+} else if (args.mode === "pm2") { // Cuando iniciamos con pm2 escribiendo "pm2 start ecosystem.config.cjs" en la terminal
     console.log(`Ejecutando el servidor usando ${args.mode}`)
     const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`));
     server.on("error", error => console.log(error))
@@ -105,11 +105,11 @@ if (args.mode === "CLUSTER") {
         server.on("error", error => console.log(error))
     }
 
-} else if (args.mode === "nginxCincoPuertos") { // Cuando iniciamos con pm2
+} else if (args.mode === "nginxCincoPuertos") { // Cuando iniciamos con pm2 escribiendo "pm2 start ecosystem.config.cjs" en la terminal
     console.log(`Ejecutando el servidor usando ${args.mode}, creando cuatro clusters de servidores con una instancia cada uno escuchando en el puerto    que se encargaran de redirigir todas sus consultas a api/randoms`)
     const server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`));
     server.on("error", error => console.log(error))
 
 } else {
-    throw new Error("Debes pasar un argumento en la consola indicando si deseas el modo cluster o el fork (para iniciar con pm2 se hace de otra manera). Ejemplo: node src/app.js --mode CLUSTER");
+    throw new Error("Debes pasar un argumento válido en la terminal indicando que modo deseas iniciar. Ejemplo: node src/app.js --mode CLUSTER");
 }

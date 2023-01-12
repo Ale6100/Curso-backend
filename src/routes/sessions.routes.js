@@ -1,9 +1,7 @@
 import { Router } from "express";
-import userModel from "../models/User.js"
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import config from "../config/config.js";
-import { createHash, validatePassword } from "../utils.js";
 import passport from "passport";
 
 const router = Router();
@@ -38,7 +36,6 @@ router.post("/login", passport.authenticate("login", { failureRedirect: "/api/se
         email: req.user.email,
         role: req.user.role
     }
-
     res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 })
 

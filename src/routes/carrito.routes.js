@@ -13,8 +13,16 @@ router.get("/", async (req, res) => { // En /api/cart devuelve todos los carrito
 
 router.get("/:cid/products", async (req, res) => { // En /api/cart/n/products devuelve el carrito con id n, siempre y cuando exista
     const { cid } = req.params
-    const result = await contenedorCarrito.getById(cid)
-    if (result === null) {
+    let result
+    try { 
+        result = await contenedorCarrito.getById(cid)
+    } catch (error) {
+        req.logger.error(`${req.infoPeticion} | Cart not found | ${error}`) // Da error cuando el tipo de id solicitado no es compatible con el id de mongo. Si esto sucede termina la petición
+        return res.send({ error: "Cart not found"})
+    }
+
+    if (!result) {
+        req.logger.error(`${req.infoPeticion} | Cart not found`)
         res.send({ error: "Cart not found"})
     } else {
         res.send({ status: "success", payload: result })
@@ -29,13 +37,21 @@ router.post("/", async (req, res) => { // Agrega una colección (que representa 
 router.post("/:cid/products/:pid", async (req, res) => { // Agrega un producto particular en un carrito en particular
     let { cid, pid } = req.params;
 
-    const carritoId = await contenedorCarrito.getById(cid)
-    const productoId = await contenedorProductos.getById(pid)
-    
-    if (carritoId === null) {
+    let carritoId, productoId
+    try { 
+        carritoId = await contenedorCarrito.getById(cid)
+        productoId = await contenedorProductos.getById(pid)
+    } catch (error) {
+        req.logger.error(`${req.infoPeticion} | Cart or product not found | ${error}`)
+        return res.send({ error: "Cart or product not found"})
+    }
+
+    if (!carritoId) {
+        req.logger.error(`${req.infoPeticion} | Cart not found`)
         res.status(404).send({ status: "error", error: "Cart not found" })
     
-    } else if (productoId === null) {
+    } else if (!productoId) {
+        req.logger.error(`${req.infoPeticion} | Product not found`)
         res.status(404).send({ status: "error", error: "Product not found" })
     
     } else {
@@ -51,7 +67,9 @@ router.delete("/:cid", async (req, res) => { // Vacía un carrito según su id
     if (datosArchivo.some(carrito => carrito.id == cid)) { // Primero verifica si el carrito con ese id está en el archivo
         await contenedorCarrito.deleteById(cid)
         res.send({ status: "sucess", message: `Carrito con id ${cid} vaciado` })
+
     } else {
+        req.logger.error(`${req.infoPeticion} | Cart not found`)
         res.send({ error: "Cart not found" })
     }
 })
@@ -59,19 +77,33 @@ router.delete("/:cid", async (req, res) => { // Vacía un carrito según su id
 router.delete("/:cid/products/:pid", async (req, res) => { // Vacía un carrito según su id
     let { cid, pid } = req.params;
 
-    const carritoId = await contenedorCarrito.getById(cid)
+    let carritoId
+    try {
+        carritoId = await contenedorCarrito.getById(cid)
+    } catch (error) {
+        req.logger.error(`${req.infoPeticion} | Cart not found | ${error}`)
+        return res.send({ error: "Cart not found"})
+    }
     
-    if (carritoId === null) {
+    if (!carritoId) {
+        req.logger.error(`${req.infoPeticion} | Cart not found`)
         res.status(404).send({ status: "error", error: "Cart not found" })
     
     } else {
-        const borrado = await contenedorCarrito.deleteContainerInContainer(cid, pid)
+        let borrado
+        try {
+            borrado = await contenedorCarrito.deleteContainerInContainer(cid, pid)
+        } catch (error) {
+            req.logger.error(`${req.infoPeticion} | Cart not found | ${error}`)
+            return res.status(404).send({ status: "error", error: "Cart not found" })
+        }
+
         if (borrado) {
             res.send({ status: "success" })
         } else {
+            req.logger.error(`${req.infoPeticion} | Product not found in cart`)
             res.status(404).send({ status: "error", error: "Product not found in cart" })
         }
-        
     }
 })
 
