@@ -59,7 +59,7 @@ router.put("/cart/comprar", async (req, res) => {
     try {
         await transport.sendMail({
             from: `${user.first_name} ${user.last_name} < >`,
-            to: "alejandro_portaluppi@outlook.com", // Aca deberia estar `${user.email}`
+            to: `${user.email}`,
             subject: `${subject}`,
             html
         })
