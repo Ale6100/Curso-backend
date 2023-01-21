@@ -45,7 +45,6 @@ for (let i=0; i<cardProduct.length; i++) { // Logica del boton + y - de cada pro
         }).showToast();    
 
         for (let i=1; i <= cant; i++) { // Agrego "cant" cantidad de veces un producto al carrito, uno a la vez (tanto esta como muchas otras cosas serán optimizadas luego)
-            console.log(productId);
             await fetch(`/api/cart/${cartId}/products/${productId}`, {
                 method: "POST"
             })

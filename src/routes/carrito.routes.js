@@ -38,28 +38,23 @@ router.post("/:cid/products/:pid", async (req, res) => { // Agrega un producto p
     let { cid, pid } = req.params;
 
     let carritoId, productoId
-    console.log(carritoId, productoId);
     try { 
         carritoId = await contenedorCarrito.getById(cid)
         productoId = await contenedorProductos.getById(pid)
     } catch (error) {
-        console.log("1");
         req.logger.error(`${req.infoPeticion} | Cart or product not found | ${error}`)
         return res.send({ error: "Cart or product not found"})
     }
 
     if (!carritoId) {
-        console.log("2");
         req.logger.error(`${req.infoPeticion} | Cart not found`)
         res.status(404).send({ status: "error", error: "Cart not found" })
     
     } else if (!productoId) {
-        console.log("3");
         req.logger.error(`${req.infoPeticion} | Product not found`)
         res.status(404).send({ status: "error", error: "Product not found" })
     
     } else {
-        console.log("4");
         contenedorCarrito.saveContainerInContainer(cid, pid)
         res.send({ status: "success" })
     }
