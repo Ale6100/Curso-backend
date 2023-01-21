@@ -4,18 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://img.icons8.com/color/48/null/backend-development--v1.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/style.css">
     <title>Perfil</title>
 </head>
 <body>
     <%- include("./partials/navBar") %> 
     <h1>Perfil</h1>
-    <% if (usuario.name) { %> <!-- Hago esto sabiendo que cuando me logueo por GitHub, el nombre se guarda en name. Pero sino, se separa en first_name y last_name -->
-        <p>Nombre: <%= usuario.name %></p>
-    <% } else {%>
-        <p>Nombre: <%= usuario.first_name %> <%= usuario.last_name %></p> 
-    <% } %> 
+    <p>Nombre: <%= usuario.first_name %> <%= usuario.last_name %></p>
     <p>Email: <%= usuario.email %></p>
+    <p>Dirección: <%= usuario.direccion %> </p>
+    <p>Edad: <%= usuario.age %> </p>
+    <p>Teléfono <%= usuario.phone %> </p>
+    <div>
+        <p>Foto o avatar:</p>
+        <img src=<%= usuario.image %>  alt="avatarIcon">
+    </div>
     <p>Tienes permisos de: <%= usuario.role %> </p>
-     
 </body>
 </html>

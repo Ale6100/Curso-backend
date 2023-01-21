@@ -3,6 +3,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import config from "../config/config.js";
 import passport from "passport";
+import uploader from "../services/upload.js";
 
 const router = Router();
 
@@ -20,8 +21,8 @@ router.use(session({
 }))
 
 // passport.authenticate("register") // Para indicarle que queremos usar la estrategia register
-router.post("/register", passport.authenticate("register", { failureRedirect: "/api/sessions/failedRegister" }), async (req, res) => {
-    const user = req.user; // Es lo que enviamos en el done de passport.config
+router.post("/register", uploader.single("image"), passport.authenticate("register", { failureRedirect: "/api/sessions/failedRegister" }), async (req, res) => {
+    const user = req.user; // Es lo que enviamos desde el done de passport.config
     res.status(400).send({ status: "success", message: `Usuario registrado. Id: ${user.id} guardado` })
 })
 
@@ -30,11 +31,18 @@ router.get("/failedRegister", (req, res) => { // Página que muestra un mensaje 
 })
 
 router.post("/login", passport.authenticate("login", { failureRedirect: "/api/sessions/failedLogin" }), async (req, res) => {
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        email: req.user.email,
-        role: req.user.role
+    const {first_name, last_name, email, direccion, age, phone, image, cartId, role} = req.user
+
+    req.session.user = { // Propiedades que tiene cada usuario logueado
+        first_name,
+        last_name,
+        email,
+        direccion,
+        age,
+        phone,
+        image,
+        cartId,
+        role
     }
     res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 })
@@ -43,23 +51,14 @@ router.get("/failedLogin", (req, res) => { // Página que muestra un mensaje si 
     res.status(500).send({ status: "error", error: "Error de passport a la hora de loguearse" })
 })
 
-
 router.get("/logout", async (req, res) => {
-    req.session.destroy(err=>{
-        if (err) return res.status(500).send("No se pudo cerrar sesión")
+    req.session.destroy(error => {
+        if (error) {
+            req.logger.fatal(`${req.infoPeticion} | No se pudo cerrar sesión | ${error}`)
+            return res.status(500).send({ status: "error", message: "No se pudo cerrar sesión" })
+        }
     })
     return res.send({ status: "success", message: "Deslogueado" })
-})
-
-router.get("/github", passport.authenticate("github"), (req, res) => {}) // Abre gitHub y solicita los datos (está conectado con el botón del html)
-
-router.get("/githubcallback", passport.authenticate("github"), (req, res) => { // Toma los datos de github e inicia sesión
-    req.session.user = {
-        name: `${req.user.first_name}`,
-        email: req.user.email,
-        role: req.user.role
-    }
-    res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 })
 
 router.get("/user", async (req, res) => {

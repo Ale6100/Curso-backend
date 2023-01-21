@@ -9,12 +9,12 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
         password: process.env.MONGO_PASSWORD
     },
 
-    github: {
-        clientId: process.env.GITHUB_CLIENTID,
-        clientSecret: process.env.GITHUB_CLIENTSECRET
-    },
-
     site: {
         name: process.env.SITE_NAME
+    },
+
+    nodemailer: {
+        user: process.env.USER_NODEMAILER,
+        pass: process.env.PASS_NODEMAILER
     }
 }

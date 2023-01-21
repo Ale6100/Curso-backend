@@ -18,12 +18,17 @@ router.use(session({
     saveUninitialized: false
 }))
 
-router.get("/", (req, res) => {
-    res.render("formUsers")
+router.get("/register", (req, res) => {
+    res.render("formRegister")
 })
 
 router.get("/login", (req, res) => {
-    res.render("formLogin")
+    const usuario = req.session.user
+    if (usuario === undefined) {
+        res.render("formLogin")
+    } else {
+        res.render("logueado")
+    }
 })
 
 export default router

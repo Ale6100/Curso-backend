@@ -1,17 +1,25 @@
 <div>
     <% if (arrayProductos.length > 0) { %>
-        <ul class="card-product">
-            <% arrayProductos.forEach(producto => { %>
-                <div>
-                    <li> Título: <%= producto.title %>  </li>
-                    <li> Precio: $<%= producto.price %>  </li>         
-                    <li> Imagen: <img src=<%= producto.image %>> </li>
-                    <li> Descripción: <%= producto.description %> </li>
-                    <li> Stock: <%= producto.stock %> </li>
+        <div>
+            <% arrayProductos.forEach((producto, index) => { %>
+                <div id=<%= `${producto._id || producto.id}` %>  class="card-product">
+                    <ul>
+                        <li> Título: <%= producto.title %>  </li>
+                        <li> Precio: $<%= producto.price %>  </li>         
+                        <li> Imagen: <img src=<%= producto.image %>> </li>
+                        <li> Descripción: <%= producto.description %> </li>
+                        <li> Stock: <span id=<%= `cardStock-${index}` %>><%= producto.stock %></span> </li>
+                    </ul>
+                    <div id=<%= `card-containerButtons-${index}` %> class="card-buttons">
+                        <button>+</button>
+                        <p>0</p>
+                        <button>-</button>
+                    </div>
+                    <button id=<%= `buttonAgregar-${index}` %> >Agregar al carrito</button>
                 </div>
             <% }) %>
-        </ul>
+        </div>
     <% } else {%>
         <p>No hay productos por mostrar</p>
-    <% } %> 
+    <% } %>
 </div>

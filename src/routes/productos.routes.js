@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { Contenedor } from "../daos/index.js";
-import { generateProduct } from "../utils/mocks.js"
 
 const router = Router(); // Inicializamos el router
 
@@ -13,19 +12,18 @@ router.get("/", async (req, res) => { // En /api/products devuelve todos los pro
     res.send({ status: "success", payload: result })
 })
 
-router.get("/test", (req, res) => { // En /api/products/test devuelve cinco productos al azar
-    let products = []
-    for (let i=0; i<5; i++) {
-        products.push(generateProduct())
-    }
-    res.render("test", { products })
-    // res.send({ status: "success", payload: products }) // Utilizar este res (y comentar el de arriba) para enviar los productos y verlos luego con Thunder Client
-})
-
 router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el producto con id n, siempre y cuando exista
     const { pid } = req.params
-    const result = await contenedor.getById(pid)
-    if (result === null) {
+    let result
+    try {
+        result = await contenedor.getById(pid)
+    } catch (error) {
+        req.logger.error(`${req.infoPeticion} | Product not found | ${error}`) // Da error cuando el tipo de id solicitado no es compatible con el id de mongo. Si esto sucede termina la petición
+        return res.send({ error: "Product not found"})
+    }
+
+    if (!result) {
+        req.logger.error(`${req.infoPeticion} | Product not found`)
         res.send({ error: "Product not found"})
     } else {
         res.send({ status: "success", payload: result })
@@ -34,12 +32,14 @@ router.get("/:pid", async (req, res) => { // En /api/products/n devuelve el prod
 
 router.post("/", async (req, res) => { // Agrega un producto al archivo gracias a Postman. Devuelve su id asignado
     if (!admin) {
+        req.logger.error(`${req.infoPeticion} | Método no autorizado`)
         return res.send({ error: -1, description: "Ruta '/api/products', método POST no autorizado" })
     }
 
     const { title, description, image, price, stock } = req.body; // Traigo sólo las propiedades que me interesan, por seguridad
         
     if (!title || !description || !image || !price || !stock) {
+        req.logger.error(`${req.infoPeticion} | Incomplete values`)
         res.status(400).send({ status: "error", error: "Incomplete values" })
     
     } else {
@@ -51,7 +51,8 @@ router.post("/", async (req, res) => { // Agrega un producto al archivo gracias 
             stock
         }
         const result = await contenedor.save(producto)
-        res.send({ status: "sucess", message: "Product added", idProduct: result })
+        res.redirect("/")
+        // res.send({ status: "sucess", message: "Product added", idProduct: result })
     }
 })
 
@@ -60,6 +61,7 @@ router.put("/:pid", async (req, res) => {
     const { pid } = req.params
 
     if (!admin) {
+        req.logger.error(`${req.infoPeticion} | Método no autorizado`)
         return res.send({ error: -1, description: `Ruta '/api/products/${pid}', método PUT no autorizado` })
     }
 
@@ -77,6 +79,7 @@ router.put("/:pid", async (req, res) => {
     producto.timestamp = Date.now()
 
     if (!title || !description || !image || !price || !stock) {
+        req.logger.error(`${req.infoPeticion} | Incomplete values`)
         res.status(400).send({ status: "error", error: "Incomplete values" })
     
     } else if (datosArchivo.some(objeto => objeto.id == pid)) {
@@ -84,6 +87,7 @@ router.put("/:pid", async (req, res) => {
         res.send({ status: "sucess", message: `Producto con id ${pid} actualizado`})
 
     } else {
+        req.logger.error(`${req.infoPeticion} | Product not found`)
         res.send({ error: "Product not found"})
     }
 })
@@ -92,6 +96,7 @@ router.delete("/:pid", async (req, res) => { // Elimina un producto según su id
     const { pid } = req.params
 
     if (!admin) {
+        req.logger.error(`${req.infoPeticion} | Método no autorizado`)
         return res.send({ error: -1, description: `Ruta '/api/products/${pid}', método DELETE no autorizado` })
     }
 
@@ -101,6 +106,7 @@ router.delete("/:pid", async (req, res) => { // Elimina un producto según su id
         await contenedor.deleteById(pid)
         res.send({ status: "sucess", message: `Producto con id ${pid} eliminado` })
     } else {
+        req.logger.error(`${req.infoPeticion} | Product not found`)
         res.send({ error: "Product not found" })
     }
 })

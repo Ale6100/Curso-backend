@@ -7,6 +7,18 @@ form.addEventListener("submit", async (e) => {
     const obj = {}
     data.forEach((value, key) => obj[key] = value)
     
+    Toastify({
+        text: "Espere por favor...",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+            background: "linear-gradient(to right, rgb(100, 100, 100), rgb(200, 200, 200))",
+        }
+    }).showToast();
+
     const res = await fetch("../api/sessions/login", {
         method: "POST",
         body: JSON.stringify(obj),
@@ -15,37 +27,20 @@ form.addEventListener("submit", async (e) => {
         }
     }).then(res => res.json())
 
-    console.log(res)
-
     if (res.status === "success") {
-        if (location.pathname === "/formUsers/login") {
-            Toastify({
-                text: "Logueado!",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                stopOnFocus: true,
-                style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
-                }
-            }).showToast();
-        } else {
-            Toastify({
-                text: "Logueado! Redireccionando en 3 segundos...",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                stopOnFocus: true,
-                style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
-                }
-            }).showToast();
-            setTimeout(() => {
-                window.location = window.location
-            }, 3000);
-        }
+        Toastify({
+            text: "Logueado! Redireccionando...",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
+
+        location.assign("/")
         
     } else {
         Toastify({

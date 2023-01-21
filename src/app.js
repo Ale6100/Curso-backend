@@ -3,16 +3,13 @@
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
 import __dirname, { infoPeticion } from "./utils.js";
-import { Contenedor } from "./daos/index.js";
+import baseRouter from "./routes/base.routes.js"
 import carritoRouter from "./routes/carrito.routes.js"
-import { Server } from "socket.io";
-import chatRouter from "./routes/views.chat.routes.js"
-import { normalize, schema } from "normalizr";
 import formUsersRouter from "./routes/views.formUsers.routes.js"
 import sessionsRouter from "./routes/sessions.routes.js"
+import randomsRouter from "./routes/randoms.routes.js"
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
-import randomsRouter from "./routes/randoms.routes.js"
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import config from "./config/config.js";
@@ -23,47 +20,42 @@ import cluster from "cluster"
 
 const app = express();
 
+const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no venga definido uno por defecto como variable de entorno
+
+const args = parseArgs(process.argv.slice(2), { default: { mode: "FORK" } }) // Valores posibles: CLUSTER y FORK. Por defecto se ejecuta el modo fork
+
 const CPUs = os.cpus().length;
-
-const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no tenga
-
-const args = parseArgs(process.argv.slice(2), { default: { mode: "FORK" } }) // Valores posibles: CLUSTER y FORK
-
-console.log("Argumentos:", args)
 
 let server
 if (args.mode === "CLUSTER") {
     if (cluster.isPrimary) { // Si nos encontramos en el proceso primario
-        console.log(`Ejecutando el servidor en modo ${args.mode}`)
-        console.log(`Proceso primario con pid ${process.pid} ejecutándose`);
+        logger.info(`Ejecutando el servidor en modo ${args.mode}`)
+        logger.info(`Proceso primario con pid ${process.pid} ejecutándose`);
         
         for (let i = 0; i < CPUs; i++) { // Genera CPUs procesos hijos (o "workers") y vuelve a correr el archivo actual, entrando en el else. La cantidad depende de la computadora
             cluster.fork();
         }
         
         cluster.on('exit', (worker) => {
-            console.log(`El proceso ${worker.process.pid} finalizó`)
+            logger.info(`El proceso ${worker.process.pid} finalizó`)
             cluster.fork();  // Cuando un proceso hijo termina, inicia otro
         })
     } else {
-        console.log(`Proceso worker con PID ${process.pid} ejecutándose`)
-        server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
+        logger.info(`Proceso worker con PID ${process.pid} ejecutándose`)
+        server = app.listen(PORT, () => logger.info(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
         server.on("error", error => logger.error(`${error}`))
     }
 
-} else if (args.mode === "FORK") {
-    console.log(`Ejecutando el servidor en modo ${args.mode}`)
-    server = app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
+} else if (args.mode === "FORK") { 
+    logger.info(`Ejecutando el servidor en modo ${args.mode}`)
+    server = app.listen(PORT, () => logger.info(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
     server.on("error", error => logger.error(`${error}`))
 
 } else {
     const error = "Debes pasar un argumento válido en la terminal indicando si deseas iniciar el servidor en modo FORK o CLUSTER. Ejemplo: node src/app.js --mode CLUSTER"
     logger.error(`${error}`)
     setTimeout(() => {throw new Error(`${error}`)}, 1000); // Para que el logger funcione necesito ejecutar el error un poco después
-    
 }
-
-const io = new Server(server) // io va a ser el servidor del socket. Va a estar conectado con nuestro servidor actual
 
 app.set("views", `${__dirname}/views`); // Ubicación de las vistas
 app.set("view engine", "ejs"); // Configuramos EJS como el motor de visualización de nuestra app
@@ -75,15 +67,6 @@ app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de arc
 
 app.use(infoPeticion)
 app.use(addLogger)
-
-app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
-app.use("/api/cart", carritoRouter)
-app.use("/api/sessions", sessionsRouter)
-app.use("/api/randoms", randomsRouter)
-app.use("/chat", chatRouter) // Ruta donde está el chat
-app.use("/formUsers", formUsersRouter)
-
-const contenedorProductos = new Contenedor("productos")
 
 const password = config.mongo.password
 const database = "dbSession" // Si no existe, la crea
@@ -102,111 +85,16 @@ initializePassport(); // Inicializamos las estrategias de passport. Genera las e
 app.use(passport.initialize()); // Genera el corazón de passport
 app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
-app.get("/", async (req, res) => { // Renderiza formulario en la ruta "/" que sirve para cargar productos)
-    const usuario = req.session.user
-    if (usuario === undefined) {
-        res.render("formLogin")
-    } else {
-        const arrayProductos = await contenedorProductos.getAll()
-        res.render("index", { arrayProductos, usuario })
-    }
-})
+app.use("/", baseRouter)
+app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
+app.use("/api/cart", carritoRouter)
+app.use("/api/sessions", sessionsRouter)
+app.use("/api/randoms", randomsRouter)
+app.use("/formUsers", formUsersRouter)
 
-app.get("/profile", async (req, res) => {
-    const usuario = req.session.user
-    if (usuario) {
-        res.render("profile", { usuario })
-    } else {
-        req.logger.error(`${req.infoPeticion} | Se trató de visitar sin estar autenticado`)
-        res.status(401).send({ status: "error", error: "No authenticated" })
-    }
-})
-
-app.get("/info", async (req, res) => {
-    const info = {
-        argumentosEntrada: process.argv.slice(2),
-        sistemaOperativo: process.platform,
-        versionNode: process.version,
-        memoriaTotalReservada: process.memoryUsage(),
-        pathEjecucion: __dirname,
-        processId: process.pid,
-        carpetaProyecto: process.cwd()
-    }
-    res.render("info", { info })
-})
-
-app.get("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
+app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
     req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
     res.status(404).send({ status: "error", error: "Error 404; Not Found"})
-})
-
-const nomalizarMensajes = (objetoContenedorMensajes) => { // Normaliza el objeto que paso como parámetro (sólo sirve para este objeto)
-    const usuario = new schema.Entity("users") // Entidad que usaré para el objeto author
-    
-    const mensaje = new schema.Entity("mensajes", { // Entidad que usaré para cada elemento del array "mensajes"
-        author: usuario // Especifico que depende de la propiedad author, que a su vez depende de la entidad usuario
-    },  { idAttribute: "_id" }) // Especifico que el id de esta entidad será la propiedad "_id", no "id" como viene por defecto
-    
-    const objetoEntity = new schema.Entity("contenedor", { // Entidad que usaré para el objeto contenedor más grande (objetoContenedorMensajes)
-        mensajes: [mensaje] // Especifico que depende de la propiedad mensajes, que a su vez es un array que depende de la entidad mensaje
-    })
-
-    const normalizedData = normalize(objetoContenedorMensajes, objetoEntity)
-    console.log("Data original:\n", JSON.stringify(objetoContenedorMensajes, null, "\t"))
-    console.log("Data normalizada:\n", JSON.stringify(normalizedData, null, "\t"))
-    
-    return [normalizedData, objetoEntity] // Retorno la data normalizada, pero también el objetoEntity ya que en el futuro podría servirme para desnormalizar
-}
-
-const quitarNewObjetId = (arrayChat) => { // Aparentemente no se puede normalizar si el array contenedor tiene objetos con la propiedad _id de MongoDB. Tal parece que el problema real está en el "new ObjetID". Esta función retorna el mismo array pero quitándole el new ObjetID y quedándose únicamente con el valor del id. Aproveché y también quité el __v. 
-    return arrayChat.map(elemento => {
-        const elementoModificado = {
-            author: elemento.author,
-            text: elemento.text,
-            _id: elemento._id.valueOf() // Ejemplo: new ObjetID("asdasd") se convierte en "asdasd"
-        }
-        return elementoModificado
-    })
-}
-
-// let mensajes = [];
-
-const contenedorHistorialChats = new Contenedor("historialChats")
-
-app.get("/api/messages/normalizr", async (req, res) => {
-    let arrayChat = await contenedorHistorialChats.getAll()
-    arrayChat = quitarNewObjetId(arrayChat)
-    const mensajesNormalizados = nomalizarMensajes({ id: "mensajes", mensajes: arrayChat })
-    res.send({ status: "sucess", payload: { mensajesNormalizados } })
-})
-
-// contenedorHistorialChats.getAll().then(response => { // Antes de iniciar el chat (justo después del npm start) recupera los mensajes del historial en caso de que haya
-//      mensajes = response
-// })
-
-//! Por ahora el chat funciona sólo con mongo, ya no con filesystem
-
-io.on("connection", async socket => {
-    // Hago que se envíe el array actualizado de productos a todos los sockets cada vez que se conecta un socket (recordemos que al enviar el formulario el usuario va a una ruta y vuelve a la principal rápidamente. En ese caso es como si se hubiera conectado un nuevo socket, lo que provocaría que esta función se ejecute)
-    io.emit("enviarProducts", await contenedorProductos.getAll())
-
-    // socket.emit("enviarMensajes", mensajes) // Envío al usuario el array (que contiene todos los mensajes pasados) para que le muestre el historial de mensajes apenas se loguee
-
-    socket.on("message", async documentoChat => { // Recibo los datos emitidos en chat.js
-        await contenedorHistorialChats.save( documentoChat )
-
-        let arrayChat = await contenedorHistorialChats.getAll()
-
-        arrayChat = quitarNewObjetId(arrayChat)
-        const mensajesNormalizados = nomalizarMensajes({ id: "mensajes", mensajes: arrayChat })
-
-        io.emit("enviarMensajes", mensajesNormalizados) // Versión nueva
-        // io.emit("enviarMensajes", mensajes) // Enviamos al io en vez de al socket para que el array llegue a todos los sockets (usuarios)
-    })
-
-    socket.on("autenticado", alias => {
-        socket.broadcast.emit("newUserConnected", alias) // El brodcast hace que se envíe a todos menos al socket (usuario) que desencadena el evento
-    })
 })
 
 export { server }

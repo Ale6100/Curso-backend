@@ -1,16 +1,44 @@
 document.getElementById("cerrarSesion").addEventListener("click", async () => {
+    Toastify({
+        text: "Espere por favor...",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+            background: "linear-gradient(to right, rgb(100, 100, 100), rgb(200, 200, 200))",
+        }
+    }).showToast();
+
+    const result = await fetch("/api/sessions/logout").then(res => res.json())
     
-    const user = await fetch("/api/sessions/user").then(res => res.json()) // Obtengo el nombre del usuario que se quiere desloguear
+    if (result.status === "success") {
+        Toastify({
+            text: "Deslogueado!",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+        }).showToast();
 
-    const nombre = user.name ? user.name : `${user.first_name} ${user.last_name}`
-
-    Swal.fire({
-        title: `Hasta luego ${nombre}!`,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-    }).then( async () => { // Después de dos segundos se desloguea y actualiza la página
-        const res = await fetch("/api/sessions/logout").then(res => res.json())
-        window.location = window.location
-    });
+        location.assign("/")
+    
+    } else {
+        Toastify({
+            text: "Error! Intente de nuevo más tarde",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "linear-gradient(to right, rgb(255, 0, 0), rgb(0, 0, 0))",
+            }
+        }).showToast();
+    }
 })
