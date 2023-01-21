@@ -2,7 +2,7 @@
 
 import express from "express";
 import productosRouter from "./routes/productos.routes.js";
-import __dirname, { infoPeticion } from "./utils.js";
+import __dirname from "./utils.js";
 import baseRouter from "./routes/base.routes.js"
 import carritoRouter from "./routes/carrito.routes.js"
 import formUsersRouter from "./routes/views.formUsers.routes.js"
@@ -13,10 +13,11 @@ import initializePassport from "./config/passport.config.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import config from "./config/config.js";
-import { addLogger, logger } from "./utils/logger.js";
+import logger from "./utils/logger.js";
 import os from "os"
 import parseArgs from "minimist";
 import cluster from "cluster"
+import { addLogger } from "./middlewares/addLogger.js";
 
 const app = express();
 
@@ -65,7 +66,6 @@ app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y pa
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-app.use(infoPeticion)
 app.use(addLogger)
 
 const password = config.mongo.password

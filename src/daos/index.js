@@ -7,7 +7,7 @@ import ContenedorDeContenedoresMongo from "./ContenedorDeContenedoresMongo.js";
 import ContenedorUsersMongo from "./ContenedorUsersMongo.js"
 import mongoose from 'mongoose';
 import config from "../config/config.js";
-import { logger } from "../utils/logger.js";
+import logger from "../utils/logger.js";
 
 // Cambiar el valor de la siguiente constante para utilizar el tipo de persistencia de datos deseado
 const PERSISTENCIA = "MONGO" // Valores posibles: FILESYSTEM y MONGO

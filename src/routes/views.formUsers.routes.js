@@ -1,34 +1,10 @@
 import { Router } from "express";
-import session from "express-session";
-import MongoStore from "connect-mongo";
-import config from "../config/config.js";
+import viewsFormUsersController from "../controllers/views.formUsers.controller.js";
 
 const router = Router();
 
-const password = config.mongo.password
-const database = "dbSession" // Si no existe, la crea
+router.get("/register", viewsFormUsersController.register)
 
-router.use(session({
-    store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
-        mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
-        ttl: 60*60*24*7
-    }),
-    secret: "asd",
-    resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
-    saveUninitialized: false
-}))
-
-router.get("/register", (req, res) => {
-    res.render("formRegister")
-})
-
-router.get("/login", (req, res) => {
-    const usuario = req.session.user
-    if (usuario === undefined) {
-        res.render("formLogin")
-    } else {
-        res.render("logueado")
-    }
-})
+router.get("/login", viewsFormUsersController.login)
 
 export default router

@@ -1,4 +1,4 @@
-import cartsModel from "../models/Carritos.js"
+import cartsModel from "./models/Carritos.js"
 
 // Esta clase crea un objeto que manipula una colección en MongoDB con documentos dentro. Dicha colección contiene documentos que a su vez contienen un array "contenedor". Este array es el "contenedor de contenedores" ya que sus elementos son objetos que representan a otros contenedores (mediante sus ids). Estos últimos contenedores deben ser creados con la clase Contenedor que está en Contenedor.js
 // Los contenedores (los elementos del array) pueden ser agregados, modificados, borrados y consultados

@@ -7,7 +7,7 @@ const customLevelsConfig = { // Creo mis propios niveles de prioridad para usar 
     info: 3,
 }
 
-export const logger = winston.createLogger({
+export default winston.createLogger({
     levels: customLevelsConfig,
     transports: [ // Diferentes medios que va a tomar el logger para poder llevar a cabo su proceso de log
         new winston.transports.Console({ // Especifico que uno de los medios para crear logs será la consola
@@ -30,9 +30,3 @@ export const logger = winston.createLogger({
         })
     ]
 })
-
-export const addLogger = (req, res, next) => { // Esto luego en app.js se setea como middleware
-    req.logger = logger;  // Agrego la configuracion del logger al req, para usarlo en cualquier ruta
-    req.logger.info(`${req.infoPeticion}`) // Se muestra este mensaje en la consola con el método "info" cada vez que se visita una ruta
-    next()
-}

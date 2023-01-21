@@ -1,4 +1,4 @@
-import usersModel from "../models/User.js"
+import usersModel from "./models/User.js"
 
 class Contenedor {
     constructor(nombreColeccion) {

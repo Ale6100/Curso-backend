@@ -1,4 +1,4 @@
-import productsModel from "../models/Productos.js"
+import productsModel from "./models/Productos.js"
 
 const stringAleatorio = (n) => { // Devuelve un string aleatorio de longitud n
     const simbolos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!¿?@#$%&()+-=*,.;:_"
