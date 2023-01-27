@@ -1,3 +1,5 @@
+import UserDto from "../dao/DTO/User.dto.js";
+
 const register = async (req, res) => {
     const user = req.user; // Es lo que enviamos desde el done de passport.config
     res.status(400).send({ status: "success", message: `Usuario registrado. Id: ${user.id} guardado` })
@@ -8,19 +10,7 @@ const failedRegister = (req, res) => { // Página que muestra un mensaje si sali
 }
 
 const login = async (req, res) => {
-    const {first_name, last_name, email, direccion, age, phone, image, cartId, role} = req.user
-
-    req.session.user = { // Propiedades que tiene cada usuario logueado
-        first_name,
-        last_name,
-        email,
-        direccion,
-        age,
-        phone,
-        image,
-        cartId,
-        role
-    }
+    req.session.user = UserDto.getLoginForm(req.user)
     res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 }
 

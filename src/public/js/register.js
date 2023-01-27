@@ -37,7 +37,7 @@ form.addEventListener("submit", async (e) => {
             }
         }).showToast();
 
-        location.assign("/")
+        location.assign("/formUsers/login")
         
     } else {
         Toastify({

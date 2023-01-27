@@ -11,9 +11,8 @@
 <body>
     <%- include("./partials/navBar") %> 
     <h1>Perfil</h1>
-    <p>Nombre: <%= usuario.first_name %> <%= usuario.last_name %></p>
+    <p>Nombre: <%= usuario.fullname %>
     <p>Email: <%= usuario.email %></p>
-    <p>Dirección: <%= usuario.direccion %> </p>
     <p>Edad: <%= usuario.age %> </p>
     <p>Teléfono <%= usuario.phone %> </p>
     <div>

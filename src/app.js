@@ -17,7 +17,8 @@ import logger from "./utils/logger.js";
 import os from "os"
 import parseArgs from "minimist";
 import cluster from "cluster"
-import { addLogger } from "./middlewares/addLogger.js";
+import addLogger from "./middlewares/addLogger.js";
+import checkLogger from "./middlewares/checkLogger.js";
 
 const app = express();
 
@@ -66,8 +67,6 @@ app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y pa
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-app.use(addLogger)
-
 const password = config.mongo.password
 const database = "dbSession" // Si no existe, la crea
 
@@ -85,6 +84,9 @@ initializePassport(); // Inicializamos las estrategias de passport. Genera las e
 app.use(passport.initialize()); // Genera el corazón de passport
 app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
+app.use(addLogger)
+app.use(checkLogger)
+
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
 app.use("/api/cart", carritoRouter)
@@ -94,7 +96,12 @@ app.use("/formUsers", formUsersRouter)
 
 app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
     req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
-    res.status(404).send({ status: "error", error: "Error 404; Not Found"})
+    
+    if (req.method === "GET") {
+        res.render("error404")
+    } else {
+        res.status(404).send({ status: "error", error: "Error 404; Not Found"})
+    }
 })
 
 export { server }

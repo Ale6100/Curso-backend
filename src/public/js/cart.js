@@ -43,7 +43,7 @@ const renderizar = async () => {
     divPedido.innerHTML = `<h1>Nuevo pedido de ${user.first_name} ${user.last_name} | ${user.email}</h1>` + `${div.outerHTML}` + `<p>Dirección de llegada: ${user.direccion}</p>`
 
     if (arrayProductos.length > 0) {
-        botonComprar.addEventListener("click", async () => { // Envio el objeto que me permitira enviar el mail de confirmacion
+        botonComprar.addEventListener("click", async () => {
             const obj = {
                 from: `${user.first_name} ${user.last_name}`,
                 to: `${user.email}`,
@@ -52,7 +52,7 @@ const renderizar = async () => {
                 user
             }
             
-            const res = await fetch("/cart/comprar", {
+            const res = await fetch("/cart/comprar", { // Envio al objeto que me permitirá enviar el mail de confirmación
                 method: "PUT",
                 body: JSON.stringify(obj),
                 headers: {

@@ -14,6 +14,7 @@
 
     <main>
         <h1>Formulario de logueo de usuario</h1>
+        <p><%= redirect ? "Haz sido redirigido aquí porque no estás logueado" : "" %> </ps>
         <form id="formLoginUsuario">    
             <Label>Email
                 <input type="email" name="email" required>

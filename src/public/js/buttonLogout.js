@@ -26,7 +26,7 @@ document.getElementById("cerrarSesion").addEventListener("click", async () => {
             }
         }).showToast();
 
-        location.assign("/")
+        location.assign("/formUsers/login")
     
     } else {
         Toastify({

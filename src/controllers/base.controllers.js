@@ -1,26 +1,17 @@
-import { Contenedor, ContenedorDeContenedores } from "../daos/index.js";
 import enviarMail from "../services/sendMail.js";
-
-const contenedorProductos = new Contenedor("productos")
-const contenedorCarrito = new ContenedorDeContenedores("carritos");
+import __dirname from "../utils.js";
+import UserDto from "../dao/DTO/User.dto.js";
+import { productService, cartService } from "../services/repositories/services.js";
 
 const base = async (req, res) => { // Renderiza el formulario en la ruta "/" que sirve para cargar productos
     const usuario = req.session.user
-    if (usuario === undefined) {
-        res.render("formLogin")
-    } else {
-        const arrayProductos = await contenedorProductos.getAll()
-        res.render("index", { arrayProductos, usuario })
-    }
+    const arrayProductos = await productService.getAll()
+    res.render("index", { arrayProductos, usuario })
 }
 
 const profile = async (req, res) => {
-    const usuario = req.session.user
-    if (usuario === undefined) {
-        res.render("formLogin")
-    } else {
-        res.render("profile", { usuario })
-    }
+    const usuario = UserDto.getPresenterForm(req.session.user)
+    res.render("profile", { usuario })
 }
 
 const info = async (req, res) => {
@@ -44,7 +35,7 @@ const comprar = async (req, res) => {
     const { user, subject, html } = req.body
     try {
         await enviarMail(user, subject, html)
-        await contenedorCarrito.deleteById(user.cartId)
+        await cartService.deleteBy({ _id: user.cartId })
         res.send({status: "success", message: "enviado"})
     } catch (error) {
         req.logger.error(`${req.infoPeticion} | ${error}`)

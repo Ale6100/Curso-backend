@@ -1,13 +1,20 @@
 const register = (req, res) => {
-    res.render("formRegister")
+    const { redirect } = req.query
+    const usuario = req.session.user
+    if (usuario) {
+        res.render("logueadoReg")
+    } else {
+        res.render("formRegister", { redirect })
+    }
 }
 
 const login = (req, res) => {
+    const { redirect } = req.query
     const usuario = req.session.user
-    if (usuario === undefined) {
-        res.render("formLogin")
+    if (usuario) {
+        res.render("logueadoLog")
     } else {
-        res.render("logueado")
+        res.render("formLogin", { redirect })
     }
 }
 

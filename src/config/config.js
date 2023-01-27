@@ -9,10 +9,6 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
         password: process.env.MONGO_PASSWORD
     },
 
-    site: {
-        name: process.env.SITE_NAME
-    },
-
     nodemailer: {
         user: process.env.USER_NODEMAILER,
         pass: process.env.PASS_NODEMAILER
