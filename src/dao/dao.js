@@ -7,12 +7,9 @@ import Cart from "./models/Cart.model.js";
 
 class Dao {
     constructor() {
-        const password = config.mongo.password
-        const database = "backend" // Si no existe, la crea
-
-        this.connection = mongoose.connect(`mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`, error => {
+        this.connection = mongoose.connect(config.mongo.url, error => {
             if (error) logger.error(`${error.toString().replaceAll("\"", '\'')}`);
-            else logger.info(`Base de mongo conectada. Database: ${database}`)
+            else logger.info(`Base de mongo conectada`)
         })
 
         const genericTimeStamps = {timestamps: {createdAt: "created_at", updatedAt: "udated_at"}}

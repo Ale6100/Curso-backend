@@ -2,7 +2,7 @@ import UserDto from "../dao/DTO/User.dto.js";
 
 const register = async (req, res) => {
     const user = req.user; // Es lo que enviamos desde el done de passport.config
-    res.status(400).send({ status: "success", message: `Usuario registrado. Id: ${user.id} guardado` })
+    res.status(200).send({ status: "success", payload: user})
 }
 
 const failedRegister = (req, res) => { // Página que muestra un mensaje si salió un error imprevisto en el registro con passport
@@ -11,7 +11,7 @@ const failedRegister = (req, res) => { // Página que muestra un mensaje si sali
 
 const login = async (req, res) => {
     req.session.user = UserDto.getLoginForm(req.user)
-    res.status(400).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
+    res.status(200).send({ status: "success", message: `Usuario con email ${req.user.email} logueado!` })
 }
 
 const failedLogin = (req, res) => { // Página que muestra un mensaje si salió un error imprevisto en el logueo con passport

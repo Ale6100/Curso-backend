@@ -6,7 +6,7 @@ dotenv.config(); // Copia todas las igualdades que estén en el archivo ".env" y
 
 export default { // Exporto un objeto que incluye de manera ordenada las variables de entorno recién mencionadas
     mongo: {
-        password: process.env.MONGO_PASSWORD
+        url: process.env.MONGO_URL
     },
 
     nodemailer: {

@@ -67,14 +67,12 @@ app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y pa
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-const password = config.mongo.password
-const database = "dbSession" // Si no existe, la crea
-
 app.use(session({
     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
-        mongoUrl: `mongodb+srv://backendCoder:${password}@cluster1.typ6zn6.mongodb.net/${database}?retryWrites=true&w=majority`,
+        mongoUrl: config.mongo.url,
         ttl: 60*60*24*7 // El time to live lo dejo en 7 días
     }),
+    name: "personalCookie",
     secret: "asd",
     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
     saveUninitialized: false
@@ -85,7 +83,7 @@ app.use(passport.initialize()); // Genera el corazón de passport
 app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
 app.use(addLogger)
-app.use(checkLogger)
+// app.use(checkLogger) // Desactivo este middleware para poder realizar los test de SuerTest.test.js sin problemas
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman

@@ -56,8 +56,8 @@ const save = async (req, res) => { // Agrega un producto al archivo gracias a Po
             code: stringAleatorio(10)
         }
         const result = await productService.save(producto)
-        res.redirect("/")
-        // res.send({ status: "sucess", message: "Product added", idProduct: result })
+        // res.redirect("/")
+        res.send({ status: "sucess", message: "Product added", idProduct: result })
     }
 }
 

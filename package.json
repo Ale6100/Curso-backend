@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test/SuperTest.test.js",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
@@ -34,5 +34,10 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
   }
 }

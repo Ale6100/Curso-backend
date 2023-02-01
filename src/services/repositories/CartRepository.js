@@ -41,5 +41,4 @@ class CartRepository extends GenericRepository {
     }
 }
 
-
 export default CartRepository
