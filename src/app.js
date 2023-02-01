@@ -83,7 +83,7 @@ app.use(passport.initialize()); // Genera el corazón de passport
 app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
 app.use(addLogger)
-// app.use(checkLogger) // Desactivo este middleware para poder realizar los test de SuerTest.test.js sin problemas
+app.use(checkLogger) // Desactivo este middleware para poder realizar los test de SuerTest.test.js sin problemas
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman

@@ -1,5 +1,5 @@
 const checkLogger = (req, res, next) => {
-    const rutasIgnoradas = ["/formUsers/register", "/formUsers/login"] // Rutas que serán ignoradas por el middleware
+    const rutasIgnoradas = ["/api/randoms", "/formUsers/register", "/formUsers/login"] // Rutas que serán ignoradas por el middleware
     const noSeIgnora = !rutasIgnoradas.includes(req.path) // Uso req.path porque no quiero que incluya las querys
     
     if (req.method === "GET" && noSeIgnora) { // Analizo únicamente con el método get
