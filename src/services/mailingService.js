@@ -10,13 +10,15 @@ const transport = nodemailer.createTransport({
     }
 })
 
-const enviarMail = async (user, subject, html) => {
+const sendMail = async (objConf) => {
+    const { from, to, subject, html, attachments } = objConf
     await transport.sendMail({
-        from: `${user.first_name} ${user.last_name} < >`,
-        to: `${user.email}`,
-        subject: `${subject}`,
-        html
+        from,
+        to,
+        subject,
+        html,
+        attachments
     })
 }
 
-export default enviarMail
+export default sendMail

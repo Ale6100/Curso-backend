@@ -39,6 +39,10 @@ class CartRepository extends GenericRepository {
         await this.updateBy({_id: idContGrande}, {$set: {contenedor: productos}})
         return contenedorChicoBorrado
     }
+
+    async deleteCartById(id) {
+        await this.updateBy({_id: id}, {$set: {contenedor: []}})
+    }
 }
 
 export default CartRepository

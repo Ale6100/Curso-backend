@@ -3,7 +3,8 @@ const precioTotal = document.getElementById("precioTotal")
 const botonComprar = document.getElementById("comprar")
 
 const renderizar = async () => {
-    const user = await fetch("/api/sessions/user").then(res => res.json()) // Obtengo el usuario actual
+    const user = await fetch("/api/sessions/current").then(res => res.json().payload) // Obtengo el usuario actual
+    if (!user) return ""
     const cartId = user.cartId
     const carrito =  await fetch(`/api/cart/${cartId}/products`).then(res => res.json().then(res => res.payload)) // Su carrito asignado, que contiene el id de los productos dentro y la cantidad de cada uno
     const arrayProductos = [] // Aca obtengo un array con los productos del carrito

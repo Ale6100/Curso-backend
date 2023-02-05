@@ -1,6 +1,6 @@
 const register = (req, res) => {
     const { redirect } = req.query
-    const usuario = req.session.user
+    const usuario = req.user
     if (usuario) {
         res.render("logueadoReg")
     } else {
@@ -10,7 +10,7 @@ const register = (req, res) => {
 
 const login = (req, res) => {
     const { redirect } = req.query
-    const usuario = req.session.user
+    const usuario = req.user
     if (usuario) {
         res.render("logueadoLog")
     } else {
@@ -18,7 +18,17 @@ const login = (req, res) => {
     }
 }
 
+const passwordRestoreRequest = (req, res) => { // Vista donde se pide el mail para restaurar la contraseña
+    res.render("passwordRestoreRequest")
+}
+
+const restorePassword = (req, res) => {
+    res.render("restorePassword")
+}
+
 export default {
     register,
-    login
+    login,
+    passwordRestoreRequest,
+    restorePassword
 }

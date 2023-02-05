@@ -1,4 +1,7 @@
-const form = document.getElementById("formLoginUsuario")
+const form = document.getElementById("restorePassword")
+const params = new Proxy(new URLSearchParams(location.search), { // Obtiene de la URL las queries que encuentre
+    get: (searchParams, prop) => searchParams.get(prop)
+})
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault()
@@ -6,7 +9,8 @@ form.addEventListener("submit", async (e) => {
     const data = new FormData(form);
     const obj = {}
     data.forEach((value, key) => obj[key] = value)
-    
+    obj.token = params.token // Agrego el token pasado en la URL
+
     Toastify({
         text: "Espere por favor...",
         duration: 3000,
@@ -19,7 +23,7 @@ form.addEventListener("submit", async (e) => {
         }
     }).showToast();
 
-    const res = await fetch("../api/sessions/login", {
+    const res = await fetch("/api/sessions/restorePassword", {
         method: "POST",
         body: JSON.stringify(obj),
         headers: {
@@ -29,7 +33,7 @@ form.addEventListener("submit", async (e) => {
 
     if (res.status === "success") {
         Toastify({
-            text: "Logueado! Redireccionando...",
+            text: "Contraseña cambiada con éxito!",
             duration: 3000,
             close: true,
             gravity: "top",
@@ -39,9 +43,7 @@ form.addEventListener("submit", async (e) => {
                 background: "linear-gradient(to right, #00b09b, #96c93d)",
             }
         }).showToast();
-
-        location.assign("/")
-        
+    
     } else {
         Toastify({
             text: res.error,

@@ -10,7 +10,16 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
     },
 
     nodemailer: {
-        user: process.env.USER_NODEMAILER,
-        pass: process.env.PASS_NODEMAILER
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS
+    },
+
+    jwt: {
+        nameCookie: process.env.JWT_NAME_COOKIE,
+        secret: process.env.JWT_SECRET
+    },
+
+    site: {
+        urlfrontend: process.env.URL_FRONTEND // Sitio donde está ubicado nuestro frontend
     }
 }

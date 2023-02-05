@@ -1,16 +1,16 @@
-import enviarMail from "../services/sendMail.js";
+import sendMail from "../services/mailingService.js";
 import __dirname from "../utils.js";
 import UserDto from "../dao/DTO/User.dto.js";
 import { productService, cartService } from "../services/repositories/services.js";
 
 const base = async (req, res) => { // Renderiza el formulario en la ruta "/" que sirve para cargar productos
-    const usuario = req.session.user
+    const usuario = req.user
     const arrayProductos = await productService.getAll()
     res.render("index", { arrayProductos, usuario })
 }
 
 const profile = async (req, res) => {
-    const usuario = UserDto.getPresenterForm(req.session.user)
+    const usuario = UserDto.getPresenterForm(req.user)
     res.render("profile", { usuario })
 }
 
@@ -34,8 +34,13 @@ const cart = async (req, res) => {
 const comprar = async (req, res) => {
     const { user, subject, html } = req.body
     try {
-        await enviarMail(user, subject, html)
-        await cartService.deleteBy({ _id: user.cartId })
+        await sendMail({
+            from: `${user.first_name} ${user.last_name} < >`,
+            to: `${user.email}`,
+            subject,
+            html
+        })
+        await cartService.deleteCartById(user.cartId)
         res.send({status: "success", message: "enviado"})
     } catch (error) {
         req.logger.error(`${req.infoPeticion} | ${error}`)

@@ -1,4 +1,4 @@
-const form = document.getElementById("formLoginUsuario")
+const form = document.getElementById("formRestorePassoword")
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault()
@@ -6,7 +6,7 @@ form.addEventListener("submit", async (e) => {
     const data = new FormData(form);
     const obj = {}
     data.forEach((value, key) => obj[key] = value)
-    
+
     Toastify({
         text: "Espere por favor...",
         duration: 3000,
@@ -19,7 +19,7 @@ form.addEventListener("submit", async (e) => {
         }
     }).showToast();
 
-    const res = await fetch("../api/sessions/login", {
+    const res = await fetch("/api/sessions/passwordRestoreRequest", {
         method: "POST",
         body: JSON.stringify(obj),
         headers: {
@@ -27,9 +27,10 @@ form.addEventListener("submit", async (e) => {
         }
     }).then(res => res.json())
 
+    
     if (res.status === "success") {
         Toastify({
-            text: "Logueado! Redireccionando...",
+            text: "Mail enviado! Verifica tu bandeja de entrada",
             duration: 3000,
             close: true,
             gravity: "top",
@@ -39,9 +40,7 @@ form.addEventListener("submit", async (e) => {
                 background: "linear-gradient(to right, #00b09b, #96c93d)",
             }
         }).showToast();
-
-        location.assign("/")
-        
+    
     } else {
         Toastify({
             text: res.error,

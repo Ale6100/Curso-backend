@@ -41,7 +41,7 @@ form.addEventListener("submit", async (e) => {
         
     } else {
         Toastify({
-            text: "Datos inválidos",
+            text: res.error,
             duration: 3000,
             close: true,
             gravity: "top",

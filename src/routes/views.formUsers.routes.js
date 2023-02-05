@@ -7,4 +7,8 @@ router.get("/register", viewsFormUsersController.register)
 
 router.get("/login", viewsFormUsersController.login)
 
+router.get("/passwordRestoreRequest", viewsFormUsersController.passwordRestoreRequest)
+
+router.get("/restorePassword", viewsFormUsersController.restorePassword)
+
 export default router

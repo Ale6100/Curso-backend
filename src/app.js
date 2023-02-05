@@ -8,17 +8,20 @@ import carritoRouter from "./routes/carrito.routes.js"
 import formUsersRouter from "./routes/views.formUsers.routes.js"
 import sessionsRouter from "./routes/sessions.routes.js"
 import randomsRouter from "./routes/randoms.routes.js"
-import passport from "passport";
-import initializePassport from "./config/passport.config.js";
-import session from "express-session";
-import MongoStore from "connect-mongo";
-import config from "./config/config.js";
+// import passport from "passport";
+// import initializePassport from "./config/passport.config.js";
+// import session from "express-session";
+// import MongoStore from "connect-mongo";
+// import config from "./config/config.js";
 import logger from "./utils/logger.js";
 import os from "os"
 import parseArgs from "minimist";
 import cluster from "cluster"
 import addLogger from "./middlewares/addLogger.js";
 import checkLogger from "./middlewares/checkLogger.js";
+import cors from "cors"
+import corsOptions from "./middlewares/cors.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -64,26 +67,29 @@ app.set("view engine", "ejs"); // Configuramos EJS como el motor de visualizaci�
 
 app.use(express.json()); // Especifica que podemos recibir json
 app.use(express.urlencoded({ extended: true })); // Habilita poder procesar y parsear datos más complejos en la url
+app.use(cookieParser());
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-app.use(session({
-    store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
-        mongoUrl: config.mongo.url,
-        ttl: 60*60*24*7 // El time to live lo dejo en 7 días
-    }),
-    name: "personalCookie",
-    secret: "asd",
-    resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
-    saveUninitialized: false
-}))
+// app.use(session({
+//     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
+//         mongoUrl: config.mongo.url,
+//         ttl: 60*60*24*7 // El time to live lo dejo en 7 días
+//     }),
+//     name: "personalCookie",
+//     secret: "asd",
+//     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
+//     saveUninitialized: false
+// }))
 
-initializePassport(); // Inicializamos las estrategias de passport. Genera las estrategias a utilizar
-app.use(passport.initialize()); // Genera el corazón de passport
-app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
+// initializePassport(); // Inicializamos las estrategias de passport. Genera las estrategias a utilizar
+// app.use(passport.initialize()); // Genera el corazón de passport
+// app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
 
 app.use(addLogger)
-app.use(checkLogger) // Desactivo este middleware para poder realizar los test de SuerTest.test.js sin problemas
+app.use(checkLogger) // Desactivo este middleware momentáneamente
+
+app.use(cors(corsOptions(['http://127.0.0.1:5173'])))
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
@@ -93,7 +99,7 @@ app.use("/api/randoms", randomsRouter)
 app.use("/formUsers", formUsersRouter)
 
 app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
-    req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
+    if (!req.url.includes("/favicon.ico")) req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
     
     if (req.method === "GET") {
         res.render("error404")
