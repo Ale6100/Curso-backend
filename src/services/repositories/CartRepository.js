@@ -1,4 +1,4 @@
-import GenericRepository from "./genericRepository.js";
+import GenericRepository from "./GenericRepository.js";
 import Cart from "../../dao/models/Cart.model.js";
 
 class CartRepository extends GenericRepository {

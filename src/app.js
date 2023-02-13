@@ -83,11 +83,7 @@ app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de arc
 app.use(addLogger)
 app.use(checkLogger)
 
-
-
 app.use(cors(corsOptions(['http://127.0.0.1:5173'])))
-
-
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter)
@@ -100,6 +96,5 @@ app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no es
     if (!req.url.includes("/favicon.ico")) req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
     res.status(404).send({ status: "error", error: "Error 404; Not Found"})
 })
-
 
 export { server }

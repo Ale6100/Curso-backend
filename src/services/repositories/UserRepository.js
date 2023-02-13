@@ -1,4 +1,4 @@
-import GenericRepository from "./genericRepository.js";
+import GenericRepository from "./GenericRepository.js";
 import User from "../../dao/models/User.model.js";
 
 class UserRepository extends GenericRepository { // Crea el repositorio específico para usuario, pero que utilice los métodos del GenericRepository
