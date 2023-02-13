@@ -18,6 +18,7 @@ import cookieParser from "cookie-parser";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUIExpress from "swagger-ui-express"
 import paymentsRouter from "./routes/payments.routes.js"
+import config from "./config/config.js";
 
 const app = express();
 
@@ -83,7 +84,7 @@ app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de arc
 app.use(addLogger)
 app.use(checkLogger)
 
-app.use(cors(corsOptions(['http://127.0.0.1:5173'])))
+app.use(cors(corsOptions([config.site.urlfrontend])))
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter)

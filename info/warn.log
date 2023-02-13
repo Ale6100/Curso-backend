@@ -1,0 +1,8 @@
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:40 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"warn","message":"13 feb 2023, 15:42 | Petición a la ruta '/js/index.js' | Método GET | El método no está configurado para esta ruta"}
+{"level":"error","message":"13 feb 2023, 15:43 | Petición a la ruta '/api/sessions/login' | Método POST | Email no encontrado"}
