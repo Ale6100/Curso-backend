@@ -4,7 +4,7 @@ import carritoController from "../controllers/carrito.controller.js";
 const router = Router();
 
 router.get("/", carritoController.getAll)
-router.get("/:cid/products", carritoController.getById)
+router.get("/:cid", carritoController.getById)
 
 router.post("/", carritoController.save)
 router.post("/:cid/products/:pid", carritoController.saveContainerInContainer)

@@ -5,14 +5,7 @@ import productosRouter from "./routes/productos.routes.js";
 import __dirname from "./utils.js";
 import baseRouter from "./routes/base.routes.js"
 import carritoRouter from "./routes/carrito.routes.js"
-import formUsersRouter from "./routes/views.formUsers.routes.js"
 import sessionsRouter from "./routes/sessions.routes.js"
-import randomsRouter from "./routes/randoms.routes.js"
-// import passport from "passport";
-// import initializePassport from "./config/passport.config.js";
-// import session from "express-session";
-// import MongoStore from "connect-mongo";
-// import config from "./config/config.js";
 import logger from "./utils/logger.js";
 import os from "os"
 import parseArgs from "minimist";
@@ -22,6 +15,9 @@ import checkLogger from "./middlewares/checkLogger.js";
 import cors from "cors"
 import corsOptions from "./middlewares/cors.js";
 import cookieParser from "cookie-parser";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUIExpress from "swagger-ui-express"
+import paymentsRouter from "./routes/payments.routes.js"
 
 const app = express();
 
@@ -53,14 +49,27 @@ if (args.mode === "CLUSTER") {
 
 } else if (args.mode === "FORK") { 
     logger.info(`Ejecutando el servidor en modo ${args.mode}`)
-    server = app.listen(PORT, () => logger.info(`Servidor escuchando en el puerto ${server.address().port}`)); // Escuchamos en el puerto cada vez que se reconozca un nuevo proceso worker. Todos los procesos se comparten el mismo puerto
+    server = app.listen(PORT, () => logger.info(`Servidor escuchando en el puerto ${server.address().port}`));
     server.on("error", error => logger.error(`${error}`))
 
 } else {
-    const error = "Debes pasar un argumento válido en la terminal indicando si deseas iniciar el servidor en modo FORK o CLUSTER. Ejemplo: node src/app.js --mode CLUSTER"
+    const error = "Debes pasar un argumento válido en la terminal indicando si deseas iniciar el servidor en modo FORK o CLUSTER. Ejemplo: node src/app.js --mode FORK"
     logger.error(`${error}`)
     setTimeout(() => {throw new Error(`${error}`)}, 1000); // Para que el logger funcione necesito ejecutar el error un poco después
 }
+
+const swaggerOptions = {
+    definition: { // Definición general de nuestra API
+        openapi: "3.0.1",
+        info: {
+            title: "Documentación Backend",
+            description: "API para el uso de un ecommerce"
+        }
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`] // Permite que todos los archivos yaml de todas las carpetas de docs sirvan para la documentación
+}
+
+const specs = swaggerJSDoc(swaggerOptions)
 
 app.set("views", `${__dirname}/views`); // Ubicación de las vistas
 app.set("view engine", "ejs"); // Configuramos EJS como el motor de visualización de nuestra app
@@ -71,41 +80,26 @@ app.use(cookieParser());
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-// app.use(session({
-//     store: MongoStore.create({ // Crea un sistema de almacenamiento en Mongo. Guarda la session en Mongo
-//         mongoUrl: config.mongo.url,
-//         ttl: 60*60*24*7 // El time to live lo dejo en 7 días
-//     }),
-//     name: "personalCookie",
-//     secret: "asd",
-//     resave: false, // Esta propiedad y la de abajo las dejo en false porque la persistencia y el sistema de vida de la session la maneja el store
-//     saveUninitialized: false
-// }))
-
-// initializePassport(); // Inicializamos las estrategias de passport. Genera las estrategias a utilizar
-// app.use(passport.initialize()); // Genera el corazón de passport
-// app.use(passport.session()); // Le decimos a passport que conecte con las sessiones que tenemos
-
 app.use(addLogger)
-app.use(checkLogger) // Desactivo este middleware momentáneamente
+app.use(checkLogger)
+
+
 
 app.use(cors(corsOptions(['http://127.0.0.1:5173'])))
 
+
+
 app.use("/", baseRouter)
-app.use("/api/products", productosRouter) // Ruta donde se carga y se visualizan productos con Postman
-app.use("/api/cart", carritoRouter)
+app.use("/api/products", productosRouter)
+app.use("/api/carts", carritoRouter)
 app.use("/api/sessions", sessionsRouter)
-app.use("/api/randoms", randomsRouter)
-app.use("/formUsers", formUsersRouter)
+app.use("/api/payments", paymentsRouter)
+app.use("/api-docs", swaggerUIExpress.serve, swaggerUIExpress.setup(specs)) // En /api-docs quiero que a partir de swaggerIUExpress se vea la documentación según la configuración que nos indicó specs
 
 app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
     if (!req.url.includes("/favicon.ico")) req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
-    
-    if (req.method === "GET") {
-        res.render("error404")
-    } else {
-        res.status(404).send({ status: "error", error: "Error 404; Not Found"})
-    }
+    res.status(404).send({ status: "error", error: "Error 404; Not Found"})
 })
+
 
 export { server }

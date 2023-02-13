@@ -4,11 +4,6 @@
     box-sizing: border-box;
 }
 
-img {
-    width: 100%;
-    height: 100%;
-}
-
 header {
     height: 50px;
     border-bottom: 1px solid rgb(0, 0, 0);
@@ -30,48 +25,6 @@ nav ul {
     list-style: none;
 }
 
-nav ul div {
-    height: 100%;
-}
-
 main {
     margin: 10px;
-}
-
-.card-product {
-    padding: 10px;
-    width: 300px;
-    border: 1px solid rgb(0, 0, 0);
-    display: flex;
-    flex-direction: column;
-}
-
-.card-product ul {
-    list-style: none;
-}
-
-.card-buttons {
-    margin: 10px 0px;
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.card-buttons button {
-    width: 100px;
-}
-
-.contenedorCart {
-    display: flex;
-    justify-content: space-evenly;
-}
-
-form {
-    margin-bottom: 10px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    height: 250px;
-    border: 1px solid rgb(0, 0, 0);
 }

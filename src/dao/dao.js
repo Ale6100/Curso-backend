@@ -26,39 +26,34 @@ class Dao {
         }
     }
 
+    // Métodos base que se utilizarán para crear otros métodos, en los archivos de la carpeta "repositories"
     save = (document, entity) => { // Guarda un documento en una colección
-        if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
         return this.models[entity].create(document)
     }
     
-    // Métodos base que se utilizarán para crear otros métodos
     get = (options, entity) => { // Realiza un tipo de find definido en options, en la colección entity
-        if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
         return this.models[entity].find(options)
     }
 
     getBy = (options, entity) => {
-        if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
         return this.models[entity].findOne(options)
     }
 
-    // update = (options, entity) => {
-    //     if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
-    //     return this.models[entity].updateMany(options)
-    // } 
+    getByAndPopulate = (options, populationQuery, entity) => { // Obtiene un documento pero además aplica un populate()
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
+        return this.models[entity].findOne(options).populate(populationQuery)
+    }
 
     updateBy = (reference, update, entity) => {
-        if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
         return this.models[entity].updateOne(reference, update)
-    } 
-
-    // delete = (options, entity) => {
-    //     if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
-    //     return this.models[entity].deleteMany(options)
-    // }
+    }
 
     deleteBy = (options, entity) => {
-        if (!this.models[entity]) throw new Error(`La entidad ${entity} no está definida entre los models`)
+        if (!this.models[entity]) throw new Error(`Entity ${entity} not defined in models`)
         return this.models[entity].deleteOne(options)
     }
 }

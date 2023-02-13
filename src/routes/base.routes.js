@@ -5,12 +5,6 @@ const router = Router();
 
 router.get("/", baseControllers.base)
 
-router.get("/profile", baseControllers.profile)
-
-router.get("/info", baseControllers.info)
-
-router.get("/cart", baseControllers.cart)
-
-router.put("/cart/comprar", baseControllers.comprar)
+router.post("/api/sendNewMail", baseControllers.sendNewMail)
 
 export default router;

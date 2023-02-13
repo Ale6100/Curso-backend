@@ -1,0 +1,270 @@
+components:
+    schemas:
+        Carts:
+            type: object
+            properties:
+                _id:
+                    type: ObjectId
+                    description: Id autogenerado por Mongo
+                contenedor:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            idProductInCart:
+                                type: ObjectId
+                                description: Id del producto en el carrito actual, referenciando al producto entero
+                            quantity:
+                                type: Number
+                                description: Cantidad de veces que el producto está en el carrito
+                created_at:
+                    type: Date
+                    description: Fecha de creación
+                udated_at:
+                    type: Date
+                    description: Fecha de última actualización
+                __v:
+                    type: Number
+                    description: Revisión interna del documento
+            example:
+                _id: 63e7ea790d28588e2265700f
+                contenedor: [
+                    {
+                        idProductInCart: 63e63f0df5296a1391d8802a,
+                        quantity: 6
+                    }
+                ]
+                created_at: 2023-02-10T12:41:58.980+00:00
+                udated_at: 2023-02-10T12:41:58.980+00:00
+                __v: 0
+
+paths:
+    /api/carts:
+        get:
+            summary: Obtiene todos los carritos de la base de datos
+            tags:
+                - Carts
+            responses:
+                "200":
+                    description: Los carritos se obtuvieron correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    payload:
+                                        type: array
+                                        items:
+                                            $ref: "#components/schemas/Carts"
+        post:
+            summary: Agrega un carrito a la base de datos
+            tags:
+                - Carts
+            responses:
+                "200":
+                    description: El carrito se agregó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Cart added
+                                    idCart:
+                                        type: string
+                                        example: '638a6f3de1ac48b03eea5474'
+    /api/carts/{cid}:
+        get:
+            summary: Obtiene el carrito según el id pasado como parámetro
+            tags:
+                - Carts
+            parameters:
+            -   name: cid
+                in: path
+                required: true
+                description: Representa al _id del carrito guardado en Mongo
+                schema:
+                    type: string
+            responses:
+                "200":
+                    description: El carrito se obtuvo correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    payload:
+                                        $ref: "#components/schemas/Carts"
+                "404":
+                    description: Carrito no encontrado
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Cart not found
+        delete:
+            summary: Vacía el carrito según el id pasado como parámetro
+            tags:
+                - Carts
+            parameters:
+            -   name: cid
+                in: path
+                required: true
+                description: Representa al _id del carrito guardado en Mongo
+                schema:
+                    type: string
+            responses:
+                "200":
+                    description: El carrito se vació correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Carrito con id 63e63f0df5296a1391d8802a vaciado
+                "404":
+                    description: El carrito no se encontró en la base de datos
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Cart not found                                        
+    /api/carts/{cid}/products/{pid}:
+        post:
+            summary: Agrega "cant" productos de un mismo tipo en un carrito, según sus ids
+            tags:
+                - Carts
+            parameters:
+            -   name: cid
+                in: path
+                required: true
+                description: Representa al _id del carrito guardado en Mongo
+                schema:
+                    type: string 
+            -   name: pid
+                in: path
+                required: true
+                description: Representa al _id del product guardado en Mongo
+                schema:
+                    type: string
+            -   name: cant
+                in: query
+                required: true
+                description: Representa la cantidad de productos que se desean agregar al carrito
+                schema:
+                    type: string                 
+            responses:
+                "200":
+                    description: El producto se agregó correctamente al carrito
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Producto agregado al carrito
+                "400":
+                    description: La cantidad de veces que se desea agregar el producto al carrito supera al stock disponible
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: error
+                                    message:
+                                        type: String
+                                        example: "Error: Superas el stock disponible"
+                "404":
+                    description: El producto y/o el carrito no se encontró en la base de datos
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: error
+                                    message:
+                                        type: String
+                                        example: Product or Cart not found 
+                "500":
+                    description: Error interno del servidor
+        delete:
+            summary: Elimina un producto del carrito, tomando como referencia a sus ids
+            tags:
+                - Carts
+            parameters:
+            -   name: cid
+                in: path
+                required: true
+                description: Representa al _id del carrito guardado en Mongo
+                schema:
+                    type: string 
+            -   name: pid
+                in: path
+                required: true
+                description: Representa al _id del product guardado en Mongo
+                schema:
+                    type: string  
+            responses:
+                "200":
+                    description: El producto se eliminó correctamente del carrito
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Producto eliminado del carrito
+                "404":
+                    description: El producto y/o el carrito no se encontró en la base de datos
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Product or Cart not found
+                "500":
+                    description: Error interno del servidor                                                         

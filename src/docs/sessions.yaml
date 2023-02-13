@@ -1,0 +1,330 @@
+components:
+    schemas:
+        User:
+            type: object
+            properties:
+                _id:
+                    type: ObjectId
+                    description: Id autogenerado por Mongo
+                first_name:
+                    type: String
+                    description: Nombre del usuario
+                last_name:
+                    type: String
+                    description: Apellido del usuario
+                email:
+                    type: String
+                    description: Email del usuario (único)
+                password:
+                    type: String
+                    description: Contraseña hasheada del usuario
+                direccion:
+                    type: String
+                    description: Dirección del usuario
+                date:
+                    type: Date
+                    description: Fecha de nacimiento del usuario
+                phone:
+                    type: String
+                    description: Número de teléfono del usuario (opcional)
+                image:
+                    type: String
+                    description: Foto de perfil del usuario (opcional)
+                cartId:
+                    type: String
+                    description: Id del carrito asignado automáticamente al usuario
+                role:
+                    type: String
+                    description: Rol del usuario (user o admin)
+                created_at:
+                    type: Date
+                    description: Fecha de creación
+                udated_at:
+                    type: Date
+                    description: Fecha de última actualización
+                __v:
+                    type: Number
+                    description: Revisión interna del documento
+            example:
+                _id: ObjectId('638a6f3de1ac48b03eea5474')
+                first_name: Juan
+                last_name: Pérez
+                email: juanperez@gmail.com
+                password: $2b$10$POPqn5lgdC7BXNapxoTq.el8RNYYWS8KIYFmevnicdIErMffgXNeK
+                direccion: calle falsa 123
+                date: "0123-03-12T00:00:00.000+00:00"
+                phone: "1112312312"
+                image: http://www.example.com/images/1676033805037-4FAA18ZIja70d1Tu5hr5cj2q1sC.webp
+                cartId: ObjectId('63e50b85ca26efe34f67e8fb')
+                role: user
+                created_at: 2023-02-11T18:25:00.832Z,
+                udated_at: 2023-02-11T18:25:00.832Z,
+                __v: 0
+    requestBodies:
+        userRegister:
+            type: object
+            properties:
+                first_name:
+                    type: String
+                    description: Nombre del usuario
+                last_name:
+                    type: String
+                    description: Apellido del usuario
+                email:
+                    type: String
+                    description: Email del usuario (único)
+                password:
+                    type: String
+                    description: Contraseña del usuario
+                direccion:
+                    type: String
+                    description: Dirección del usuario
+                date:
+                    type: Date
+                    description: Fecha de nacimiento del usuario
+                phone:
+                    type: String
+                    description: Número de teléfono del usuario
+                image:
+                    type: String
+                    description: Foto de perfil del usuario (opcional)
+            example:
+                first_name: Juan
+                last_name: Pérez
+                email: juanperez@gmail.com
+                password: 123asd
+                direccion: calle falsa 123
+                date: "0123-03-12T00:00:00.000+00:00"
+                phone: "1112312312"
+                image: http://www.example.com/images/1676033805037-4FAA18ZIja70d1Tu5hr5cj2q1sC.webp
+        userLogin:
+            type: object
+            properties:
+                email:
+                    type: String
+                    description: Email del usuario
+                password:
+                    type: String
+                    description: Contraseña del usuario
+            example:
+                email: juanperez@gmail.com
+                password: 123asd
+        userPasswordRestoreRequest:
+            type: object
+            properties:
+                email:
+                    type: String
+                    description: Email del usuario
+            example:
+                email: juanperez@gmail.com
+        userRestorePassword:
+            type: object
+            properties:
+                password:
+                    type: String
+                    description: Nueva contraseña del usuario
+                token:
+                    type: String
+                    description: Mail tokenizado del usuario
+            example:
+                password: "123123a"
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFsZWphbmRyb19jMTM0N0Bob3RtYWlsLmNvbSIsImlhdCI6MTY3NjE0MzYzOCwiZXhwIjoxNjc2MjMwMDM4fQ.dsIjtVKMNpLUhGvDltwbuXPh
+
+paths:
+    /api/sessions/register:
+        post:
+            summary: Registra (crea) un nuevo usuario en la base de datos
+            tags:
+                - Sessions
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/userRegister"
+            responses:
+                "200":
+                    description: El usuario se registró satisfactoriamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    payload:
+                                        type: Sbject
+                                        example:
+                                            _id: ObjectId('638a6f3de1ac48b03eea5474')
+                                            first_name: Juan
+                                            last_name: Pérez
+                                            email: juanperez@gmail.com
+                                            password: $2b$10$POPqn5lgdC7BXNapxoTq.el8RNYYWS8KIYFmevnicdIErMffgXNeK
+                                            direccion: calle falsa 123
+                                            date: "0123-03-12T00:00:00.000+00:00"
+                                            phone: "1112312312"
+                                            image: http://www.example.com/images/1676033805037-4FAA18ZIja70d1Tu5hr5cj2q1sC.webp
+                                            cartId: ObjectId('63e50b85ca26efe34f67e8fb')
+                                            role: user
+                                            created_at: 2023-02-11T18:25:00.832Z,
+                                            udated_at: 2023-02-11T18:25:00.832Z,
+                                            __v: 0
+
+                "400":
+                    description: El usuario no envió los parámetros completos o ya existía y no se puede volver a registrar
+                "500":
+                    description: Error interno del servidor
+    /api/sessions/login:
+        post:
+            summary: Loguea a un usuario por medio de una cookie
+            tags:
+                - Sessions
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/userLogin"
+            responses:
+                "200":
+                    description: El usuario se logueó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Usuario con mail juanperez@gmail.com logueado!
+                "400":
+                    description: El email no existe o la contraseña es inválida
+                "500":
+                    description: Error interno del servidor
+    /api/sessions/current:
+        get:
+            summary: Si hay un usuario logueado, lo obtiene
+            tags:
+                - Sessions
+            responses:
+                "200":
+                    description: El usuario está logueado y se pudo obtener
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    payload: 
+                                        $ref: "#/components/schemas/User"
+                "404":
+                    description: El usuario está no está logueado y por lo tanto no se pudo obtener
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: error
+                                    error: 
+                                        type: String
+                                        example: Usuario no logueado
+
+    /api/sessions/passwordRestoreRequest:
+        post:
+            summary: Envía un mail para que el usuario pueda reestablecer la contraseña
+            tags:
+                - Sessions
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/userPasswordRestoreRequest"
+            responses:
+                "200":
+                    description: El usuario se logueó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Usuario con mail juanperez@gmail.com logueado!
+                "400":
+                    description: El mail no existe en la base de datos
+                "500":
+                    description: Error interno del servidor
+
+    /api/sessions/restorePassword:
+        put:
+            summary: Reestablece la contraseña de un usuario
+            tags:
+                - Sessions
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/userRestorePassword"
+            responses:
+                "200":
+                    description: La contraseña se cambió correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Contraseña cambiada
+                "400":
+                    description: La contraseña es inválida, no hay ningún usuario con el email del token, o el tiempo para reestablecer la contraseña expiró
+                "500":
+                    description: Error interno del servidor
+
+    /api/sessions/logout:
+        get:
+            summary: Desloguea al usuario actual
+            tags:
+                - Sessions
+            responses:
+                "200":
+                    description: El usuario se deslogueó correctamete si tenía una sesión abierta, si no, no cambió nada
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Usuario deslogueado
+                "500":
+                    description: Error interno del servidor
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Error, inténtelo de nuevo más tarde

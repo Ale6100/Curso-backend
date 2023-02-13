@@ -1,57 +1,34 @@
 import sendMail from "../services/mailingService.js";
 import __dirname from "../utils.js";
-import UserDto from "../dao/DTO/User.dto.js";
-import { productService, cartService } from "../services/repositories/services.js";
 
-const base = async (req, res) => { // Renderiza el formulario en la ruta "/" que sirve para cargar productos
-    const usuario = req.user
-    const arrayProductos = await productService.getAll()
-    res.render("index", { arrayProductos, usuario })
+const base = async (req, res) => { // Renderiza una pequeña presentación en la ruta "/"
+    res.render("index")
 }
 
-const profile = async (req, res) => {
-    const usuario = UserDto.getPresenterForm(req.user)
-    res.render("profile", { usuario })
-}
+const sendNewMail = async (req, res) => { // En api/sendNewMail con el método POST envía un mail con los valores pasados en el body
+    const { from, to, subject, html } = req.body
 
-const info = async (req, res) => {
-    const info = {
-        argumentosEntrada: process.argv.slice(2),
-        sistemaOperativo: process.platform,
-        versionNode: process.version,
-        memoriaTotalReservada: process.memoryUsage(),
-        pathEjecucion: __dirname,
-        processId: process.pid,
-        carpetaProyecto: process.cwd()
+    if (!from || !to || !subject || !html) {
+        req.logger.error(`${req.infoPeticion} | Incomplete values`)
+        return res.status(400).send({status: "error", error: "Valores incompletos"})
     }
-    res.render("info", { info })
-}
 
-const cart = async (req, res) => {
-    res.render("cart")
-}
-
-const comprar = async (req, res) => {
-    const { user, subject, html } = req.body
     try {
         await sendMail({
-            from: `${user.first_name} ${user.last_name} < >`,
-            to: `${user.email}`,
+            from,
+            to,
             subject,
             html
         })
-        await cartService.deleteCartById(user.cartId)
-        res.send({status: "success", message: "enviado"})
+
+        res.status(200).send({status: "success", message: "Enviado"})
     } catch (error) {
-        req.logger.error(`${req.infoPeticion} | ${error}`)
-        res.send({status: "error", message: `Error: ${error}`})
+        req.logger.fatal(`${req.infoPeticion} | ${error}`)
+        res.status(500).send({status: "error", error})
     }
 }
 
 export default {
     base,
-    profile,
-    info,
-    cart,
-    comprar
+    sendNewMail
 }

@@ -1,0 +1,154 @@
+components:
+    requestBodies:
+        paymentIntents:
+            type: object
+            properties:
+                total:
+                    type: String
+                    description: Precio final de la compra
+                clientId:
+                    type: ObjectId
+                    description: _id del cliente generado por Mongo
+                direccion:
+                    type: String
+                    description: Dirección del cliente
+                phone:
+                    type: Number
+                    description: Número de teléfono del cliente
+            example:
+                total: 5850
+                clientId: "638a6f3de1ac48b03eea5474"
+                direccion: Calle falsa 213
+                phone: 1112341234
+        updateCartDeleteStockSendMail:
+            type: object
+            properties:
+                from:
+                    type: String
+                    description: Nombre completo del cliente
+                to:
+                    type: String
+                    description: Email del cliente
+                subject:
+                    type: String
+                    description: Título del mail
+                html:
+                    type: String
+                    description: Cuerpo del mail en formato HTML, donde se detalla el pedido
+                cartId:
+                    type: ObjectId
+                    description: propiedad _id del carrito asignado al cliente
+                products:
+                    type: Array
+                    description: Array con los productos que el cliente compró
+            example:
+                from: "Roberto Carlos"
+                to: roberto@correo.com
+                subject: Confirmación de compra
+                html: <div> <p>Detalles del pedido... </p> </dic>
+                cartId: 638a6f3de1ac48b03eea5474
+                products: [
+                      {
+                        _id: '63e63f0df5296a1391d8802a',
+                        title: 'Los juegos del hambre: Sinsajo - Parte 1',
+                        description: 'Katniss Everdeen se convierte a regañadientes en el símbolo de una rebelión masiva contra el autocrático Capitolio.',
+                        price: 500,
+                        image: "https://dummyimage.com/600x400/000/fff",
+                        stock: 397,
+                        code: ')EfR-tgk#H',
+                        created_at: '2023-02-10T12:56:45.054Z',
+                        udated_at: '2023-02-12T16:35:45.895Z',
+                        __v: 0,
+                        quantity: 3
+                    }
+                ]
+
+paths:
+    /api/payments/payment-intents:
+        post:
+            summary: Inicializa el intento de pago
+            tags:
+                - Payments
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/paymentIntents"
+            responses:
+                "200":
+                    description: El intento de pago se inició correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    payload:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: String
+                                                example: pi_3MakmFFdlUVIjvc60U5VRtvR
+                                            object:
+                                                type: String
+                                                example: payment_intent
+                                            client_secret:
+                                                type: String
+                                                example: pi_3MakmFFdlUVIhvc60U6URTui_secret_Ofb4BKo5Pb4IUSikuiyFLcjTO
+                                            metadata:
+                                                type: object
+                                                properties:
+                                                    direccion:
+                                                        type: String
+                                                        example: Calle falsa 213
+                                                    phone:
+                                                        type: String
+                                                        example: "1112341234"
+                                            status:
+                                                type: String
+                                                example: requires_payment_method
+                "400":
+                    description: Incomplete values
+    /api/payments/updateCartDeleteStockSendMail:
+        put:
+            summary: Actualiza el carrito de la base de datos, el stock, y envía un mail de confirmación de compra
+            tags:
+                - Payments
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#components/requestBodies/updateCartDeleteStockSendMail"
+            responses:
+                "200":
+                    description: Tanto el carrito como el stock se actualizaron correctamente en la base de datos, y el mail de confirmación fue enviado
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Petición exitosa
+                "400":
+                    description: Los valores enviados a la petición están incompletos (aunque en este caso más un error de programación que del usuario)
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Valores incompletos
+                "500":
+                    description: Error interno del servidor                                        

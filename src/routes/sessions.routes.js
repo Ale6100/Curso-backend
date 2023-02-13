@@ -12,7 +12,7 @@ router.get("/current", sessionsController.current)
 
 router.post("/passwordRestoreRequest", sessionsController.passwordRestoreRequest)
 
-router.post("/restorePassword", sessionsController.restorePassword)
+router.put("/restorePassword", sessionsController.restorePassword)
 
 router.get("/logout", sessionsController.logout)
 

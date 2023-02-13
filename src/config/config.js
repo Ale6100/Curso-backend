@@ -1,8 +1,8 @@
 import dotenv from "dotenv"
 
-dotenv.config(); // Copia todas las igualdades que estén en el archivo ".env" y las transforma como propiedades del process.env (es decir inicializa todas las variables de entorno que defina allí)
+dotenv.config(); // Copia todas las igualdades que estén en el archivo ".env" y las convierte a propiedades del process.env (es decir, inicializa todas las variables de entorno que defina allí)
 
-// Por seguridad el archivo .env no lo dejo como público, puedes hacerte el tuyo a la altura de la carpeta src
+// Por seguridad al archivo .env no lo dejo como público, puedes hacerte el tuyo a la altura de la carpeta src
 
 export default { // Exporto un objeto que incluye de manera ordenada las variables de entorno recién mencionadas
     mongo: {
@@ -21,5 +21,14 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
 
     site: {
         urlfrontend: process.env.URL_FRONTEND // Sitio donde está ubicado nuestro frontend
+    },
+
+    admin: {
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD
+    },
+
+    stripe: {
+        secret_key: process.env.STRIPE_SECRET_KEY
     }
 }

@@ -7,7 +7,8 @@ class Product {
         return {
             title: {
                 type: String,
-                required: true
+                required: true,
+                unique: true
             },
             description: {
                 type: String,

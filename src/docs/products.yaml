@@ -1,0 +1,304 @@
+components:
+    schemas:
+        Products:
+            type: object
+            properties:
+                _id:
+                    type: ObjectId
+                    description: Id autogenerado por Mongo
+                title:
+                    type: String
+                    description: Título del producto (único)
+                description:
+                    type: String
+                    description: Descripción del producto
+                price:
+                    type: Number
+                    description: Precio del producto
+                image:
+                    type: String
+                    description: Imagen del producto
+                stock:
+                    type: Number
+                    description: Stock del producto
+                code:
+                    type: String
+                    description: Código único
+                created_at:
+                    type: Date
+                    description: Fecha de creación
+                udated_at:
+                    type: Date
+                    description: Fecha de última actualización
+                __v:
+                    type: Number
+                    description: Revisión interna del documento
+            example:
+                _id: 638a6f3de1ac48b03eea5474
+                title: Harry Potter y las reliquias de la muerte - Parte 1
+                description: Harry, Ron y Hermione se marchan de Hogwarts para iniciar su misión más importante. Tienen que destruir los horrocruxes, el secreto del poder y la inmortalidad de Voldemort, en los que el temido mago oscuro guarda los fragmentos de su alma.
+                price: 500
+                image: http://www.example.com/images/1676033805037-4FAA18ZIja70d1Tu5hr5cj2q1sC.webp
+                stock: 400
+                code: HfDImkOVdY
+                created_at: 2023-02-10T12:41:58.980+00:00
+                udated_at: 2023-02-10T12:41:58.980+00:00
+                __v: 0
+    requestBodies:
+        productAdd:
+            type: object
+            properties:
+                title:
+                    type: String
+                    description: Título del producto (único)
+                description:
+                    type: String
+                    description: Descripción del producto
+                price:
+                    type: Number
+                    description: Precio del producto
+                image:
+                    type: String
+                    description: Imagen del producto (por defecto se usa multer, pero por aquí puedes pasar una URL)
+                stock:
+                    type: Number
+                    description: Stock del producto
+            example:
+                title: Harry Potter y las reliquias de la muerte - Parte 1
+                description: Harry, Ron y Hermione se marchan de Hogwarts para iniciar su misión más importante. Tienen que destruir los horrocruxes, el secreto del poder y la inmortalidad de Voldemort, en los que el temido mago oscuro guarda los fragmentos de su alma.
+                price: 500
+                image: https://dummyimage.com/600x400/000/fff
+                stock: 400
+        productUpdate:
+            type: object
+            properties:
+                title:
+                    type: String
+                    description: Título del producto (único)
+                description:
+                    type: String
+                    description: Descripción del producto
+                price:
+                    type: Number
+                    description: Precio del producto
+                image:
+                    type: String
+                    description: Imagen del producto (por defecto se usa multer, pero por aquí puedes pasar una URL)
+                stock:
+                    type: Number
+                    description: Stock del producto
+            example:
+                title: Harry Potter y las reliquias de la muerte - Parte 1
+                description: Harry, Ron y Hermione se marchan de Hogwarts para iniciar su misión más importante. Tienen que destruir los horrocruxes, el secreto del poder y la inmortalidad de Voldemort, en los que el temido mago oscuro guarda los fragmentos de su alma.
+                price: 500
+                image: https://dummyimage.com/600x400/000/fff
+                stock: 400
+
+paths:
+    /api/products:
+        get:
+            summary: Obtiene todos los productos de la base de datos
+            tags:
+                - Products
+            responses:
+                "200":
+                    description: Los productos se obtuvieron correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    payload:
+                                        type: array
+                                        items:
+                                            $ref: "#components/schemas/Products"
+        post:
+            summary: Agrega un producto a la base de datos
+            tags:
+                - Products
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/requestBodies/productAdd"
+            responses:
+                "200":
+                    description: El producto se agregó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status: 
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Product added
+                                    idProduct:
+                                        type: string
+                                        example: '638a6f3de1ac48b03eea5474'
+                "400":
+                    description: Los valores llegan incompletos o el título con ese producto ya existe
+    /api/products/{pid}:
+        get:
+            summary: Obtiene el producto con el _id pasado como parámetro
+            tags:
+                - Products
+            parameters:
+            -   name: pid
+                in: path
+                required: true
+                description: Representa al _id del producto guardado en Mongo
+                schema:
+                    type: string
+            responses:
+                "200":
+                    description: El producto se obtuvo correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    payload:
+                                        $ref: "#components/schemas/Products"
+                "404":
+                    description: El producto no se encontró
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Product not found 
+        put:
+            summary: Actualiza el producto con el _id pasado como parámetro
+            tags:
+                - Products
+            parameters:
+            -   name: pid
+                in: path
+                required: true
+                description: Representa al _id del producto guardado en Mongo
+                schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#components/requestBodies/productUpdate"
+            responses:
+                "200":
+                    description: El producto se actualizó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Producto actualizado
+                "404":
+                    description: El producto no se encontró
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Producto no encontrado
+        delete:
+            summary: Elimina el producto con el _id pasado como parámetro
+            tags:
+                - Products
+            parameters:
+            -   name: pid
+                in: path
+                required: true
+                description: Representa al _id del producto guardado en Mongo
+                schema:
+                    type: string
+            responses:
+                "200":
+                    description: El producto se eliminó correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Producto eliminado
+                "404":
+                    description: El producto no se encontró
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Producto no encontrado                                                                    
+    /api/products/title/{ptitle}:
+        get:
+            summary: Obtiene el producto con el título pasado como parámetro
+            tags:
+                - Products
+            parameters:
+            -   name: ptitle
+                in: path
+                required: true
+                description: Representa a la propiedad title del producto guardado en Mongo
+                schema:
+                    type: string
+            responses:
+                "200":
+                    description: El producto se obtuvo correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    payload:
+                                        $ref: "#components/schemas/Products"
+                "404":
+                    description: El producto no se encontró
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Product not found

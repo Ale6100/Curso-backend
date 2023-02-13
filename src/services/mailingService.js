@@ -10,7 +10,7 @@ const transport = nodemailer.createTransport({
     }
 })
 
-const sendMail = async (objConf) => {
+const sendMail = async (objConf) => { // Envía un mail según los datos que vengan como argumento
     const { from, to, subject, html, attachments } = objConf
     await transport.sendMail({
         from,

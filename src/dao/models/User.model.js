@@ -31,8 +31,8 @@ class User {
                 required: true
             },
 
-            age: {
-                type: Number,
+            date: {
+                type: Date,
                 required: true
             },
 

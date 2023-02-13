@@ -1,18 +1,25 @@
+import mongoose from "mongoose"
+
 class Cart {
     static get model() { // Nombre de la colección a manipular
         return "carts"
     }
 
-    static get schema() { // Estructura que tendrá cada documento en mongo
+    static get schema() { // Estructura que tendrá cada documento en Mongo
         return {
-            timestamp: {
-                type: Number,
-                required: true
-            },
-            contenedor: {
-                type: Array,
-                required: true
-            }
+            contenedor: [
+                {
+                    idProductInCart: {
+                        type: mongoose.SchemaTypes.ObjectId,
+                        ref: "products", // Se tiene que llamar igual que la colección donde se guardan los productos, para después traer (poblar) los demás productos usando esta referencia
+                        required: true
+                    },
+                    quantity: {
+                        type: Number,
+                        required: true
+                    }
+                }
+            ]
         }
     }
 }

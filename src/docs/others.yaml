@@ -1,0 +1,64 @@
+components:
+    schemas:
+        Mail:
+            type: object
+            properties:
+                from:
+                    type: String
+                    description: Nombre completo del emisor
+                to:
+                    type: String
+                    description: Email del receptor
+                subject:
+                    type: String
+                    description: Título del mail
+                html:
+                    type: String
+                    description: Cuerpo del mail en formato HTML
+            example:
+                from: "Roberto Carlos"
+                to: adrian@correo.com
+                subject: Nuevo Mail
+                html: <div> <p> Cuerpo del mail... </p> </dic>
+
+paths:
+    /api/sendNewMail:
+        post:
+            summary: Envía un mail usando los datos pasados en el body
+            tags:
+                - Others
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Mail"
+            responses:
+                "200":
+                    description: El mail se envió correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: success
+                                    message:
+                                        type: String
+                                        example: Enviado
+                "400":
+                    description: Los valores no se enviaron al body correctamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: String
+                                        example: error
+                                    error:
+                                        type: String
+                                        example: Valores incompletos
+                "500":
+                    description: Error interno del servidor                                         
