@@ -75,7 +75,11 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
     
         const userDatosPublicos = UserDto.getLoginForm(usuario)
         const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
-        res.cookie(config.jwt.nameCookie, tokenizedUser).status(200).send({ status: "success", message: `Usuario con email ${userDatosPublicos.email} logueado!`}) // Guardo el token en una cookie con un nombre para identificarlo
+        res.cookie(config.jwt.nameCookie, tokenizedUser, {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        }).status(200).send({ status: "success", message: `Usuario con email ${userDatosPublicos.email} logueado!`}) // Guardo el token en una cookie con un nombre para identificarlo
     
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)

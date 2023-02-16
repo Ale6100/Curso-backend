@@ -10,7 +10,7 @@ router.get("/:pid", productosController.getById)
 
 router.get("/title/:ptitle", productosController.getByTitle)
 
-router.post("/", uploader.single("image") , productosController.save)
+router.post("/", uploader.single("image"), productosController.save)
 
 router.put("/:pid", uploader.single("image"), productosController.update)
 

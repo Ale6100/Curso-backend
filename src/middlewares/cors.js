@@ -1,4 +1,4 @@
-const corsOptions = (whitelist) => { // Recibe una lista de dominios que tienen permido hacer peticiones. Advertencia: las url con la palabra explícita "localhost" no funcionan para loguearse
+const corsOptions = (whitelist) => { // Recibe una lista de dominios que tienen permido hacer peticiones. Advertencia: las url con la palabra explícita "localhost" no funcionan correctamente
     return {
         credentials: true,
         origin: whitelist,

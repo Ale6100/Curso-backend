@@ -20,7 +20,8 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
     },
 
     site: {
-        urlfrontend: process.env.URL_FRONTEND // Sitio donde está ubicado nuestro frontend
+        urlfrontend: process.env.URL_FRONTEND, // Sitio donde está ubicado nuestro frontend
+        accessToken: process.env.ACCESS_TOKEN
     },
 
     admin: {

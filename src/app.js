@@ -19,6 +19,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUIExpress from "swagger-ui-express"
 import paymentsRouter from "./routes/payments.routes.js"
 import config from "./config/config.js";
+import checkPermissions from "./middlewares/checkPermissions.js";
 
 const app = express();
 
@@ -64,7 +65,7 @@ const swaggerOptions = {
         openapi: "3.0.1",
         info: {
             title: "Documentación Backend",
-            description: "API para el uso de un ecommerce"
+            description: "API para el uso de un ecommerce. Si deseas poner a prueba alguno de estos endpoints de manera manual desde aquí, debes loguearte como administrador desde el endpoint /api/sessions/login que encontrarás más abajo",
         }
     },
     apis: [`${__dirname}/docs/**/*.yaml`] // Permite que todos los archivos yaml de todas las carpetas de docs sirvan para la documentación
@@ -81,10 +82,11 @@ app.use(cookieParser());
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
+app.use(cors(corsOptions([config.site.urlfrontend])))
+
 app.use(addLogger)
 app.use(checkLogger)
-
-app.use(cors(corsOptions([config.site.urlfrontend])))
+app.use(checkPermissions)
 
 app.use("/", baseRouter)
 app.use("/api/products", productosRouter)
@@ -92,10 +94,5 @@ app.use("/api/carts", carritoRouter)
 app.use("/api/sessions", sessionsRouter)
 app.use("/api/payments", paymentsRouter)
 app.use("/api-docs", swaggerUIExpress.serve, swaggerUIExpress.setup(specs)) // En /api-docs quiero que a partir de swaggerIUExpress se vea la documentación según la configuración que nos indicó specs
-
-app.all("*", (req, res) => { // El asterisco representa cualquier ruta que no esté definida
-    if (!req.url.includes("/favicon.ico")) req.logger.warn(`${req.infoPeticion} | El método no está configurado para esta ruta`)
-    res.status(404).send({ status: "error", error: "Error 404; Not Found"})
-})
 
 export { server }
