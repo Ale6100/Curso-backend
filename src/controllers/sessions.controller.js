@@ -56,8 +56,12 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
                 return res.status(400).send({status: "error", error: "Contraseña inválida"})
             }
             const userDatosPublicos = UserDto.getLoginForm({ email })
-            const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" })
-            return res.cookie(config.jwt.nameCookie, tokenizedUser).status(200).send({ status: "success", message: `Usuario con email ${userDatosPublicos.email} logueado!`})
+            const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "1h" })
+            return res.cookie(config.jwt.nameCookie, tokenizedUser, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+            }).status(200).send({ status: "success", message: `Usuario con email ${userDatosPublicos.email} logueado!`})
         }
 
         const usuario = await userService.getBy({ email })
@@ -74,7 +78,7 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
         }
     
         const userDatosPublicos = UserDto.getLoginForm(usuario)
-        const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
+        const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "1h" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
         res.cookie(config.jwt.nameCookie, tokenizedUser, {
             httpOnly: true,
             sameSite: "none",
@@ -164,7 +168,11 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
 
 const logout = async (req, res) => { // En /api/sessions/logout con el método GET se desloguea al usuario actual, si es que había uno logueado
     try {
-        res.clearCookie(config.jwt.nameCookie).send({ status: "success", message: "Usuario deslogueado" }) // Deslogueo al usuario eliminando la cookie
+        res.clearCookie(config.jwt.nameCookie, {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        }).send({ status: "success", message: "Usuario deslogueado" }) // Deslogueo al usuario eliminando la cookie
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
         res.status(500).send({ status: "error", error: "Error, inténtelo de nuevo más tarde" })
