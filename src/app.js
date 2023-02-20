@@ -23,7 +23,7 @@ import checkPermissions from "./middlewares/checkPermissions.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no venga definido uno por defecto como variable de entorno
+const PORT = process.env.PORT || 8080; // Elige el puerto 8080 en caso de que no venga definido uno por defecto como variable de entorno. Recomiendo el 8080 ya que ahí tengo actualmente las imágenes de los productos
 
 const args = parseArgs(process.argv.slice(2), { default: { mode: "FORK" } }) // Valores posibles: CLUSTER y FORK. Por defecto se ejecuta el modo fork
 

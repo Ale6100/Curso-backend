@@ -211,7 +211,7 @@ paths:
                 - Sessions
             responses:
                 "200":
-                    description: El usuario está logueado y se pudo obtener
+                    description: Responde con un objeto cuya propiedad payload tiene al usuario si está logueado o undefined si no lo está
                     content:
                         application/json:
                             schema:
@@ -222,19 +222,6 @@ paths:
                                         example: success
                                     payload: 
                                         $ref: "#/components/schemas/User"
-                "404":
-                    description: El usuario está no está logueado y por lo tanto no se pudo obtener
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    status: 
-                                        type: String
-                                        example: error
-                                    error: 
-                                        type: String
-                                        example: Usuario no logueado
 
     /api/sessions/passwordRestoreRequest:
         post:

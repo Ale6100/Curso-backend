@@ -56,7 +56,7 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
                 return res.status(400).send({status: "error", error: "Contraseña inválida"})
             }
             const userDatosPublicos = UserDto.getLoginForm({ email })
-            const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "1h" })
+            const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" })
             return res.cookie(config.jwt.nameCookie, tokenizedUser, {
                 httpOnly: true,
                 sameSite: "none",
@@ -78,7 +78,7 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
         }
     
         const userDatosPublicos = UserDto.getLoginForm(usuario)
-        const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "1h" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
+        const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
         res.cookie(config.jwt.nameCookie, tokenizedUser, {
             httpOnly: true,
             sameSite: "none",
@@ -93,7 +93,6 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
 
 const current = async (req, res) => { // En /api/sessions/current con el método GET se obtiene la información del usuario logueado
     const user = req.user
-    if (!user) return res.status(404).send({status: "error", error: "Usuario no logueado"})
     return res.status(200).send({ status: "success", payload: user })
 }
 
