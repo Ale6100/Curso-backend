@@ -82,7 +82,68 @@ app.use(cookieParser());
 
 app.use(express.static(__dirname + "/public")); // Quiero que mi servicio de archivos estáticos se mantenga en public
 
-app.use(cors(corsOptions([config.site.urlfrontend])))
+const confAuto = () => {
+    app.use(cors(corsOptions([config.site.urlfrontend])))
+}
+
+const confManual = () => {
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", config.site.urlfrontend);
+        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, HEAD");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        res.header("Access-Control-Allow-Credentials", true);
+        next();
+    });
+}
+
+const confOptions = () => {
+    app.options("*", function(req, res) {
+        res.header("Access-Control-Allow-Origin", config.site.urlfrontend);
+        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, HEAD");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        res.header("Access-Control-Allow-Credentials", true);
+        res.sendStatus(200);
+    });
+}
+
+if (config.cors.auto === "true") {
+    if (config.cors.manual === "true") {
+        if (config.cors.options === "true") {
+            logger.info("CORS AUTO, MANUAL Y OPTIONS")
+            confAuto()
+            confManual()
+            confOptions() 
+        } else {
+            logger.info("CORS AUTO Y MANUAL")
+            confAuto()
+            confManual()
+        }
+    } else {
+        logger.info("CORS AUTO Y OPTIONS")
+        confAuto()
+        confOptions() 
+    }
+} else {
+    logger.info("CORS MANUAL Y OPTIONS")
+    confManual()
+    confOptions() 
+}
+
+if (config.cors.auto === "true" && config.cors.manual !== "true" && config.cors.options !== "true") {
+    logger.info("CORS AUTO")
+    confAuto()
+} else if (config.cors.auto !== "true" && config.cors.manual === "true" && config.cors.options !== "true") {
+    logger.info("CORS MANUAL")
+    confManual()
+} else if (config.cors.auto !== "true" && config.cors.manual !== "true" && config.cors.options === "true") {
+    logger.info("CORS OPTIONS")
+    confOptions()
+}
+
+logger.info(`AUTO: ${config.cors.auto}`)
+logger.info(`MANUAL: ${config.cors.manual}`)
+logger.info(`OPTIONS: ${config.cors.options}`)
+logger.info("-----")
 
 app.use(addLogger)
 app.use(checkLogger)

@@ -28,3 +28,12 @@ nav ul {
 main {
     margin: 10px;
 }
+
+p {
+    margin: 10px 0px;
+}
+
+a {
+    color: rgb(0, 0, 255);
+    text-decoration: none;
+}

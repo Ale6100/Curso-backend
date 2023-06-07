@@ -1,8 +1,9 @@
 import sendMail from "../services/mailingService.js";
 import __dirname from "../utils.js";
+import config from "../config/config.js";
 
 const base = async (req, res) => { // Renderiza una pequeña presentación en la ruta "/"
-    res.render("index")
+    res.render("index", { frontendUrl: config.site.urlfrontend })
 }
 
 const sendNewMail = async (req, res) => { // En api/sendNewMail con el método POST envía un mail con los valores pasados en el body

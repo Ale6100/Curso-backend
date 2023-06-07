@@ -3,7 +3,7 @@ import config from "../config/config.js"
 const checkPermissions = (req, res, next) => { // Chequea si la persona que hace peticiones está autorizado para eso
     if (req.url.includes("/api/sessions/login") || req.url.includes("/api/sessions/logout")) return next() // No quiero que exista ese chequeo para loguearte y desloguearte
     
-    if (req.headers.origin?.includes(config.site.urlfrontend)) { // Entra en este if si hacemos la petición desde el frontend. Gracias al cors sé que las peticiones desde el cliente siempre van a tener el origin
+    if (req.headers.origin?.includes(config.site.urlfrontend)) { // Entra en este if si hacemos la petición desde el frontend. Gracias al módulo cors sé que las peticiones desde el cliente siempre van a tener el origin
         if (req.file || req.headers.authorization?.split(" ")[1] === config.site.accessToken) return next() // Permitimos el acceso del cliente sólo si en los encabezados coloca el token de acceso, utilizando el esquema de autenticación Bearer
         req.logger.error(`${req.infoPeticion} | Forbidden | You do not have permissions, be sure to pass a valid access token "accesToken" in the body of your request to the server`)
         return res.status(403).send({ status: "error", "error": 'Forbidden | You do not have permissions, be sure to pass a valid access token "accesToken" in the body of your request to the server' })

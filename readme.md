@@ -1,5 +1,7 @@
 # Proyecto e-commerce completo | Parte backend
 
+**ACTUALIZACIÓN SEMANA 07/06/23: Proyecto en mantenimiento, puedes pasarte por los commits previos para tener una versión estable**
+
 Este proyecto lo realicé en mi curso de Backend donde debía hacer un e-commerce. La parte Frontend (necesaria para que funcione) se encuentra [aquí](https://github.com/Ale6100/Curso-backend-parte-front.git).
 
 ## Comenzando 🚀
