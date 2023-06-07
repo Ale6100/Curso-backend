@@ -201,7 +201,7 @@ paths:
                                         type: String
                                         example: Usuario con mail juanperez@gmail.com logueado!
                 "400":
-                    description: El email no existe o la contraseña es inválida
+                    description: El email no está registrado o la contraseña es inválida
                 "500":
                     description: Error interno del servidor
     /api/sessions/current:
@@ -279,7 +279,9 @@ paths:
                                         type: String
                                         example: Contraseña cambiada
                 "400":
-                    description: La contraseña es inválida, no hay ningún usuario con el email del token, o el tiempo para reestablecer la contraseña expiró
+                    description: La contraseña es inválida, no hay ningún usuario con el email del token
+                "403":
+                    description: El tiempo para reestablecer la contraseña expiró
                 "500":
                     description: Error interno del servidor
 

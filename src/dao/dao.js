@@ -8,7 +8,7 @@ import Cart from "./models/Cart.model.js";
 class Dao {
     constructor() {
         this.connection = mongoose.connect(config.mongo.url, error => {
-            if (error) logger.error(`${error.toString().replaceAll("\"", '\'')}`);
+            if (error) logger.fatal(`${error.toString().replaceAll("\"", '\'')}`);
             else logger.info(`Base de mongo conectada`)
         })
 

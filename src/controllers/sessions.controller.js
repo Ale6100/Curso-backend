@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import { userService, cartService } from "../services/repositories/services.js"
 import sendMail from "../services/mailingService.js";
-import { server } from "../app.js";
 import { createHash, validatePassword } from "../utils.js";
 
 const register = async (req, res) => { // En /api/sessions/register con el método POST, registra a un usuario en la base de datos
@@ -34,7 +33,7 @@ const register = async (req, res) => { // En /api/sessions/register con el méto
             direccion,
             date,
             phone: phone || "No especificado",
-            image: `${req.protocol}://${req.hostname}:${server.address().port}/images/${req.file ? req.file.filename : "default.png"}`, // Sabemos que la foto de perfil se guarda en esta ruta. En caso de registrar al usuario con Swagger, se guardará la que viene por defecto (default.png)
+            image: `/images/profiles/${req.file ? req.file.filename : "default.png"}`, // Sabemos que la foto de perfil se guarda en esta ruta relativa. En caso de registrar al usuario con Swagger, se guardará la que viene por defecto (default.png)
             cartId: newCart._id.valueOf()
         })
     
@@ -67,8 +66,8 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
         const usuario = await userService.getBy({ email })
         
         if (!usuario) {
-            req.logger.error(`${req.infoPeticion} | Email no encontrado`)
-            return res.status(400).send({status: "error", error: "Email no encontrado"})
+            req.logger.error(`${req.infoPeticion} | Email no registrado`)
+            return res.status(400).send({status: "error", error: "Email no registrado"})
         }
         
         const isValidPassword = await validatePassword(usuario, password)
@@ -157,7 +156,7 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
     } catch (error) {
         if (error.expiredAt) {
             req.logger.error(`${req.infoPeticion} | Token expirado, tiempo para reestablecer la contraseña agotado | ${error}`)
-            return res.status(400).send({ status: "error", error: "Tiempo para reestablecer la contraseña agotado" })
+            return res.status(403).send({ status: "error", error: "Tiempo para reestablecer la contraseña agotado" })
         }
 
         req.logger.fatal(`${req.infoPeticion} | ${error}`)

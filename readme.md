@@ -20,35 +20,41 @@ Necesitas tener previamente descargado e instalado [NodeJs](https://nodejs.org/)
 
 Instala las dependencias con el comando
 
-```npm install```
+```
+npm install
+```
 
 ## Despliegue 📦
 
 Corre el proyecto con el comando
 
-```npm start```
+```
+npm start
+```
 
-Se sugiere la creación de variables de entorno mediante la elaboración de un archivo .env en el mismo nivel de la carpeta src. Este archivo debe ser completado con los siguientes campos, los cuales deberán ser modificados con tus propias credenciales en lugar del valor X. Es importante destacar que algunas credenciales, identificadas con un asterisco, pueden ser completadas con cualquier valor (por ejemplo: JWT_NAME_COOKIE = ilua21da812).
+Es necesario crear variables de entorno mediante la elaboración de un archivo .env en el mismo nivel que la carpeta src. Este archivo debe completarse con los siguientes campos, los cuales deben modificarse con tus propias credenciales en lugar del valor "X". Es importante destacar que algunas credenciales, identificadas con un asterisco, pueden ser completadas con cualquier valor personalizado (por ejemplo: JWT_NAME_COOKIE = ilua21da812).:
 
-MONGO_URL = X | URL de mongo, la que ponemos dentro de mongoose.connect(X)
+```env
+MONGO_URL = X # URL de mongo, la que ponemos dentro de mongoose.connect(X)
 
-NODEMAILER_USER = X | Tu gmail, que será utilizado para enviar mails en el servicio de mensajería gratuito
+NODEMAILER_USER = X # Tu gmail, que será utilizado para enviar mails en el servicio de mensajería gratuito
 
-NODEMAILER_PASS = X | Tu contraseña de gmail
+NODEMAILER_PASS = X # Tu contraseña de gmail
 
-JWT_NAME_COOKIE = X* | Nombre de la cookie donde se comprueba el logueo de un usuario
+JWT_NAME_COOKIE = X* # Nombre de la cookie donde se comprueba el logueo de un usuario
 
-JWT_SECRET = X* | Cadena de caracteres que se utiliza como una clave secreta para firmar el token JSON Web Token
+JWT_SECRET = X* # Cadena de caracteres que se utiliza como una clave secreta para firmar el token JSON Web Token
 
-URL_FRONTEND = X | URL de tu frontend sin barra lateral final (por ejemplo http://127.0.0.1:5173 en vez de http://127.0.0.1:5173/)
+URL_FRONTEND = X # URL de tu frontend sin barra lateral final
 
-ACCESS_TOKEN = X* | Cadena de caracteres utilizado como mecanismo de autenticación para asegurar que solamente los usuarios que presenten este token en los encabezados de sus solicitudes puedan acceder al backend. Importante: Su valor tiene que ser el mismo que el de la variable de entorno VITE_ACCESS_TOKEN que ponés en el [front](https://github.com/Ale6100/Curso-backend-parte-front.git).
+ACCESS_TOKEN = X* # Cadena de caracteres utilizado como mecanismo de autenticación para asegurar que solamente los usuarios que presenten este token en los encabezados de sus solicitudes puedan acceder al backend. Importante: Su valor tiene que ser el mismo que el de la variable de entorno VITE_ACCESS_TOKEN que ponés en el [front](https://github.com/Ale6100/Curso-backend-parte-front.git).
 
-ADMIN_EMAIL = X | Email del administrador
+ADMIN_EMAIL = X # Email del administrador
 
-ADMIN_PASSWORD = X | Contraseña del administrador
+ADMIN_PASSWORD = X # Contraseña del administrador
 
-STRIPE_SECRET_KEY = X | Key secreta de stripe
+STRIPE_SECRET_KEY = X # Key secreta de stripe
+```
 
 *Importante*: Asegúrate de que la [parte front](https://github.com/Ale6100/Curso-backend-parte-front.git) esté ejecutándose
 

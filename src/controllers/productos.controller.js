@@ -1,5 +1,4 @@
 import { productService } from "../services/repositories/services.js"
-import { server } from "../app.js";
 
 const stringAleatorio = (n) => { // Devuelve un string aleatorio de longitud n
     const simbolos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789¡!¿?@#$%&()+-=*,.;:_"
@@ -67,7 +66,7 @@ const save = async (req, res) => { // En /api/products con el método POST agreg
     const producto = {
         title,
         description,
-        image: image || `${req.protocol}://${req.hostname}:${server.address().port}/images/${req.file.filename}`,
+        image: image || `/images/products/${req.file.filename}`, // Si paso la url de una imagen externa se guarda con el protocolo https incluído. Si es una ruta local, entonces sé que es una imagen cargada con Multer
         price: parseFloat(price),
         stock,
         code: stringAleatorio(10)
@@ -88,7 +87,7 @@ const update = async (req, res) => { // En /api/products/pid con el método PUT,
     description && (oldProduct.description = description)
     price && (oldProduct.price = price)
     stock && (oldProduct.stock = stock)
-    req.file && (oldProduct.image = `${req.protocol}://${req.hostname}:${server.address().port}/images/${req.file.filename}`)
+    req.file && (oldProduct.image = `/images/products/${req.file.filename}`)
     image && (oldProduct.image = image) // En principio esto no debería ser necesario, pero lo dejo por si se desea testear el endpoint con Swagger, mandando una imagen usando una URL
 
     if (datosArchivo.some(objeto => objeto._id == pid)) {
