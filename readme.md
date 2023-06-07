@@ -1,8 +1,8 @@
 # Proyecto e-commerce completo | Parte backend
 
-**ACTUALIZACIÓN SEMANA 07/06/23: Proyecto en mantenimiento, puedes pasarte por los commits previos para tener una versión estable**
-
 Este proyecto lo realicé en mi curso de Backend donde debía hacer un e-commerce. La parte Frontend (necesaria para que funcione) se encuentra [aquí](https://github.com/Ale6100/Curso-backend-parte-front.git).
+
+Utiliza la versión más reciénte del proyecto subido a la web [aquí](https://proyectocompleto.netlify.app/).
 
 ## Comenzando 🚀
 
@@ -58,7 +58,7 @@ ADMIN_PASSWORD = X # Contraseña del administrador
 STRIPE_SECRET_KEY = X # Key secreta de stripe
 ```
 
-*Importante*: Asegúrate de que la [parte front](https://github.com/Ale6100/Curso-backend-parte-front.git) esté ejecutándose
+*Importante*: Asegúrate de que la [parte frontend](https://github.com/Ale6100/Curso-backend-parte-front.git) esté ejecutándose
 
 ## Construido con 🛠️
 

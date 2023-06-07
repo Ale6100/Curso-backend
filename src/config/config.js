@@ -31,11 +31,5 @@ export default { // Exporto un objeto que incluye de manera ordenada las variabl
 
     stripe: {
         secret_key: process.env.STRIPE_SECRET_KEY
-    },
-
-    cors: {
-        auto: process.env.CORS_AUTO,
-        manual: process.env.CORS_MANUAL,
-        options: process.env.CORS_OPTIONS
     }
 }

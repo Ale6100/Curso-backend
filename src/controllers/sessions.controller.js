@@ -33,7 +33,7 @@ const register = async (req, res) => { // En /api/sessions/register con el méto
             direccion,
             date,
             phone: phone || "No especificado",
-            image: `/images/profiles/${req.file ? req.file.filename : "default.png"}`, // Sabemos que la foto de perfil se guarda en esta ruta relativa. En caso de registrar al usuario con Swagger, se guardará la que viene por defecto (default.png)
+            image: `/images/profiles/${req.file ? req.file.filename : "default.webp"}`, // Sabemos que la foto de perfil se guarda en esta ruta relativa. En caso de registrar al usuario con Swagger, se guardará la que viene por defecto (default.webp)
             cartId: newCart._id.valueOf()
         })
     
