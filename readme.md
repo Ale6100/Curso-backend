@@ -82,7 +82,7 @@ STRIPE_SECRET_KEY = X # Key secreta de stripe
 * [swagger-ui-express](https://www.npmjs.com/package/swagger-ui-express)
 * [winston](https://www.npmjs.com/package/winston)
 
-## Autores ✒️
+## Autor ✒️
 
 * **Alejandro Portaluppi** - [LinkedIn](https://www.linkedin.com/in/alejandro-portaluppi/)
 

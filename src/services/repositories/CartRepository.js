@@ -6,24 +6,25 @@ class CartRepository extends GenericRepository {
         super(dao, Cart.model)
     }
 
-    async saveContainerInContainer(cartId, productId, cant) { // Guarda el id de un producto dentro de un carrito, "cant" cantidad de veces. La propiedad quantity nos especifica cuántas veces un producto está en el carrito. Necesitamos el id de ambos para poder referenciarlos
+    async saveContainerInContainer(cartId, productId, cant) { // Guarda el id de un producto dentro de un carrito, "cant" cantidad de veces. La propiedad quantity nos especifica cuántas veces un producto está en el carrito. Necesitamos el id de ambos para poder referenciarlos. Devuelve el producto actualizado
         let document = await this.getBy({_id: cartId})
         let productos = document.contenedor
-        
+        let updatedProduct
+
         if (productos.some(producto => producto.idProductInCart.valueOf() === productId)) { // Si el producto ya estaba en el carrito, le suma la cantidad
             productos = productos.map(prod => {
                 if (prod.idProductInCart.valueOf() === productId){
                     prod.quantity += cant
+                    updatedProduct = prod
                 }
                 return prod
             })
         } else { // Si no estaba, lo agrega mediante una referencia id y una cantidad
-            productos.push({
-                idProductInCart: productId,
-                quantity: cant
-            })
+            updatedProduct = { idProductInCart: productId, quantity: cant }
+            productos.push(updatedProduct)
         }
         await this.updateBy({_id: cartId}, {$set: {contenedor: productos}})
+        return updatedProduct
     }
 
     async deleteContainerInContainer(cartId, productId) { // Elimina un producto dentro de un carrito gracias a sus ids

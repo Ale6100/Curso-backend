@@ -194,6 +194,23 @@ paths:
                                     message:
                                         type: String
                                         example: Producto agregado al carrito
+                                    updatedProduct:
+                                        type: object
+                                        properties:
+                                            _id:
+                                                type: ObjectId
+                                                description: Id autogenerado por Mongo
+                                            quantity:
+                                                type: Number
+                                                description: Nueva cantidad de veces que el producto está en el carrito
+                                            idProductInCart:
+                                                type: String
+                                                description: Id del producto en el carrito actual, referenciando al producto entero
+                                        example:
+                                            _id: 6481dbbe8fe09eff7e0534f3
+                                            quantity: 18
+                                            idProductInCart: 6481041ba69e32d93bec9639,
+
                 "400":
                     description: La cantidad de veces que se desea agregar el producto al carrito supera al stock disponible
                     content:

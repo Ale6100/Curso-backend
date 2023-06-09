@@ -152,7 +152,6 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
         await userService.updateBy({ _id: user._id }, {$set: { password: newPassword }})
         
         res.send({ status: "success", message: "Contraseña cambiada" })
-
     } catch (error) {
         if (error.expiredAt) {
             req.logger.error(`${req.infoPeticion} | Token expirado, tiempo para reestablecer la contraseña agotado | ${error}`)

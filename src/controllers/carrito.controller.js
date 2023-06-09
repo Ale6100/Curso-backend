@@ -30,7 +30,7 @@ const save = async (req, res) => { // En api/carts con el método POST agrega a 
     res.status(200).send({ status: "sucess", message: "Cart added", idCart: result._id.valueOf() })
 }
 
-const saveContainerInContainer = async (req, res) => { // En api/carts/cid/products/pid con el método POST agrega "cant" productos de un mismo tipo en un carrito, según sus ids
+const saveContainerInContainer = async (req, res) => { // En api/carts/cid/products/:pid?cant=cant con el método POST agrega "cant" productos de un mismo tipo en un carrito, según sus ids
     try {
         const { cid, pid } = req.params;
         let { cant } = req.query
@@ -65,8 +65,8 @@ const saveContainerInContainer = async (req, res) => { // En api/carts/cid/produ
             }
         }
     
-        await cartService.saveContainerInContainer(cid, pid, cant)
-        res.status(200).send({ status: "success", message: "Producto agregado al carrito" })
+        const updatedProduct = await cartService.saveContainerInContainer(cid, pid, cant)
+        res.status(200).send({ status: "success", message: "Producto agregado al carrito", updatedProduct })
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
         res.status(500).send({status: "error", error })
