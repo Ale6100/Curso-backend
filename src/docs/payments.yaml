@@ -57,7 +57,7 @@ components:
                         stock: 397,
                         code: ')EfR-tgk#H',
                         created_at: '2023-02-10T12:56:45.054Z',
-                        udated_at: '2023-02-12T16:35:45.895Z',
+                        updated_at: '2023-02-12T16:35:45.895Z',
                         __v: 0,
                         quantity: 3
                     }
@@ -112,6 +112,8 @@ paths:
                                                 example: requires_payment_method
                 "400":
                     description: Incomplete values
+                "500":
+                    description: Error interno del servidor                    
     /api/payments/updateCartDeleteStockSendMail:
         put:
             summary: Actualiza el carrito de la base de datos, el stock, y envía un mail de confirmación de compra

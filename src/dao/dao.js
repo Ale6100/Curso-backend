@@ -12,7 +12,7 @@ class Dao {
             else logger.info(`Base de mongo conectada`)
         })
 
-        const genericTimeStamps = {timestamps: {createdAt: "created_at", updatedAt: "udated_at"}}
+        const genericTimeStamps = {timestamps: {createdAt: "created_at", updatedAt: "updated_at"}}
 
         // Creo todos los schemas 
         const userSchema = mongoose.Schema(User.schema, genericTimeStamps) // De la configuración de cada usuario, toma la estructura del schema y crea el schema, anexándole los timestamps

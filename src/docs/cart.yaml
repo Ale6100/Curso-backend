@@ -20,7 +20,7 @@ components:
                 created_at:
                     type: Date
                     description: Fecha de creación
-                udated_at:
+                updated_at:
                     type: Date
                     description: Fecha de última actualización
                 __v:
@@ -35,7 +35,7 @@ components:
                     }
                 ]
                 created_at: 2023-02-10T12:41:58.980+00:00
-                udated_at: 2023-02-10T12:41:58.980+00:00
+                updated_at: 2023-02-10T12:41:58.980+00:00
                 __v: 0
 
 paths:
