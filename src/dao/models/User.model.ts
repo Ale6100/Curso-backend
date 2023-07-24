@@ -1,5 +1,7 @@
+import { Models } from "../../types/types"
+
 class User {
-    static get model() { // Nombre de la colección a manipular
+    static get model(): Models["user"] { // Nombre de la colección a manipular
         return "users"
     }
 

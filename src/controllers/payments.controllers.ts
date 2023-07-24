@@ -1,8 +1,9 @@
 import PaymentService from "../services/payments.js";
 import sendMail from "../services/mailingService.js";
 import { productService, cartService } from "../services/repositories/services.js";
+import { Request, Response } from "express";
 
-const paymentIntents = async (req, res) => { // En api/payments/payment-intents con el método POST, inicializo un intento de pago
+const paymentIntents = async (req: Request, res: Response) => { // En api/payments/payment-intents con el método POST, inicializo un intento de pago
     try {
         const { total, clientId, direccion, phone } = req.body
 
@@ -24,15 +25,15 @@ const paymentIntents = async (req, res) => { // En api/payments/payment-intents 
         const paymentService = new PaymentService()
         let result = await paymentService.createPaymentIntent(paymentIntentsInfo)
     
-        res.status(200).send({ status: "success", payload: result })   
+        return res.status(200).send({ status: "success", payload: result })   
 
     } catch (error) { // La compra no debe superar los $999,999.99 según stripe
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
-        res.status(500).send({status: "error", error})
+        return res.status(500).send({status: "error", error})
     }
 }
 
-const updateCartDeleteStockSendMail = async (req, res) => { // En api/payments/updateCartDeleteStockSendMail con el método PUT, actualiza el carrito de la base de datos, el stock, y envía un mail de confirmación de compra
+const updateCartDeleteStockSendMail = async (req: Request, res: Response) => { // En api/payments/updateCartDeleteStockSendMail con el método PUT, actualiza el carrito de la base de datos, el stock, y envía un mail de confirmación de compra
     const { from, to, subject, html, cartId, products } = req.body
 
     if (!from || !to || !subject || !html || !cartId || !products) {
@@ -53,11 +54,11 @@ const updateCartDeleteStockSendMail = async (req, res) => { // En api/payments/u
             await productService.updateBy({ _id: products[i]._id }, { $inc: { stock: -products[i].quantity } })
         }
         
-        res.status(200).send({status: "success", message: "Petición exitosa"})
+        return res.status(200).send({status: "success", message: "Petición exitosa"})
 
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
-        res.status(500).send({status: "error", error})
+        return res.status(500).send({status: "error", error})
     }
 }
 

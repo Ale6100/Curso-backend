@@ -1,7 +1,8 @@
 import mongoose from "mongoose"
+import { Models } from "../../types/types"
 
 class Cart {
-    static get model() { // Nombre de la colección a manipular
+    static get model(): Models["cart"] { // Nombre de la colección a manipular
         return "carts"
     }
 

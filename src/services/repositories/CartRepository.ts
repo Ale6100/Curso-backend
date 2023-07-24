@@ -1,13 +1,15 @@
 import GenericRepository from "./GenericRepository.js";
 import Cart from "../../dao/models/Cart.model.js";
+import Dao from "../../dao/dao.js";
+import { CartMongo } from "../../types/carts.js";
 
 class CartRepository extends GenericRepository {
-    constructor(dao) {
+    constructor(dao: Dao) {
         super(dao, Cart.model)
     }
 
-    async saveContainerInContainer(cartId, productId, cant) { // Guarda el id de un producto dentro de un carrito, "cant" cantidad de veces. La propiedad quantity nos especifica cuántas veces un producto está en el carrito. Necesitamos el id de ambos para poder referenciarlos. Devuelve el producto actualizado
-        let document = await this.getBy({_id: cartId})
+    async saveContainerInContainer(cartId: string, productId: string, cant: number) { // Guarda el id de un producto dentro de un carrito, "cant" cantidad de veces. La propiedad quantity nos especifica cuántas veces un producto está en el carrito. Necesitamos el id de ambos para poder referenciarlos. Devuelve el producto actualizado
+        let document = await this.getBy({_id: cartId}) as CartMongo
         let productos = document.contenedor
         let updatedProduct
 
@@ -27,9 +29,9 @@ class CartRepository extends GenericRepository {
         return updatedProduct
     }
 
-    async deleteContainerInContainer(cartId, productId) { // Elimina un producto dentro de un carrito gracias a sus ids
+    async deleteContainerInContainer(cartId: string, productId: string) { // Elimina un producto dentro de un carrito gracias a sus ids
         let productoBorrado = false
-        let document = await this.getBy({_id: cartId})
+        let document = await this.getBy({_id: cartId}) as CartMongo
         let productos = document.contenedor
 
         if (productos.some(producto => producto.idProductInCart.valueOf() === productId)) {
@@ -41,7 +43,7 @@ class CartRepository extends GenericRepository {
         return productoBorrado
     }
 
-    getByAndPopulate = (options) => {
+    getByAndPopulate = (options: any) => {
         return this.dao.getByAndPopulate(options, {
             path: "contenedor", // Propiedad que quiero poblar (debe llamarse igual que el array del Cart.model.js que queremos llenar)
             populate: { // Dentro del contenedor también quiero que se haga otro "populate" tomando como referencia el products de Cart.model.js
@@ -50,7 +52,7 @@ class CartRepository extends GenericRepository {
         }, Cart.model)
     }
 
-    async deleteCartById(id) {
+    async deleteCartById(id: string) {
         await this.updateBy({_id: id}, {$set: {contenedor: []}})
     }
 }

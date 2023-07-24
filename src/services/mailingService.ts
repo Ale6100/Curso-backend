@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer"
 import config from "../config/config.js";
+import { SendMail } from "../types/types.js";
 
 const transport = nodemailer.createTransport({
     service: 'gmail',
@@ -10,7 +11,7 @@ const transport = nodemailer.createTransport({
     }
 })
 
-const sendMail = async (objConf) => { // Envía un mail según los datos que vengan como argumento
+const sendMail = async (objConf: SendMail) => { // Envía un mail según los datos que vengan como argumento
     const { from, to, subject, html, attachments } = objConf
     await transport.sendMail({
         from,

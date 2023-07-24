@@ -4,8 +4,10 @@ import config from "../config/config.js";
 import { userService, cartService } from "../services/repositories/services.js"
 import sendMail from "../services/mailingService.js";
 import { createHash, validatePassword } from "../utils.js";
+import { Request, Response } from "express";
+import { Email } from "../types/types.js";
 
-const register = async (req, res) => { // En /api/sessions/register con el método POST, registra a un usuario en la base de datos
+const register = async (req: Request, res: Response) => { // En /api/sessions/register con el método POST, registra a un usuario en la base de datos
     try {
         const { first_name, last_name, direccion, date, phone, email, password } = req.body;
         if (!first_name || !last_name || !direccion || !date || !email || !password) {
@@ -21,11 +23,12 @@ const register = async (req, res) => { // En /api/sessions/register con el méto
         
         const hashedPassword = await createHash(password) // Hashea la contraseña para que no sea visible para nadie
 
+        //! Corregir
         const newCart = await cartService.save({ // Creo un nuevo carrito y luego asocio su id al nuevo usuario
             contenedor: []
         })
 
-        const usuario = UserDto.getDbDTOFrom({
+        const usuario = UserDto.getRegisterFrom({
             first_name,
             last_name,
             email,
@@ -38,15 +41,15 @@ const register = async (req, res) => { // En /api/sessions/register con el méto
         })
     
         const result = await userService.save(usuario)
-        res.status(200).send({ status: "success", payload: result}) // Enviamos al usuario, dando por hecho que todo salió bien
+        return res.status(200).send({ status: "success", payload: result}) // Enviamos al usuario, dando por hecho que todo salió bien
     
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
-        res.status(500).send({status: "error", error })
+        return res.status(500).send({status: "error", error })
     }
 }
 
-const login = async (req, res) => { // En /api/sessions/login con el método POST, logueamos al usuario según el email y password que llegó en el body
+const login = async (req: Request, res: Response) => { // En /api/sessions/login con el método POST, logueamos al usuario según el email y password que llegó en el body
     const { email, password } = req.body
     try {
         if (email === config.admin.email) { // Los administradores se pueden loguear con un mail y contraseña especial guardada como variable de entorno, por seguridad no se guardan en la misma base de datos que los usuarios
@@ -55,6 +58,7 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
                 return res.status(400).send({status: "error", error: "Contraseña inválida"})
             }
             const userDatosPublicos = UserDto.getLoginForm({ email })
+
             const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" })
             return res.cookie(config.jwt.nameCookie, tokenizedUser, {
                 httpOnly: true,
@@ -78,7 +82,7 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
     
         const userDatosPublicos = UserDto.getLoginForm(usuario)
         const tokenizedUser = jwt.sign(userDatosPublicos, config.jwt.secret, { expiresIn: "7d" }) // Colocamos la tokenización | Cifra al usuario en un token que expira en 7 días
-        res.cookie(config.jwt.nameCookie, tokenizedUser, {
+        return res.cookie(config.jwt.nameCookie, tokenizedUser, {
             httpOnly: true,
             sameSite: "none",
             secure: true,
@@ -86,16 +90,16 @@ const login = async (req, res) => { // En /api/sessions/login con el método POS
     
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
-        res.status(500).send({status: "error", error })
+        return res.status(500).send({status: "error", error })
     }
 }
 
-const current = async (req, res) => { // En /api/sessions/current con el método GET se obtiene la información del usuario logueado
+const current = async (req: Request, res: Response) => { // En /api/sessions/current con el método GET se obtiene la información del usuario logueado
     const user = req.user
     return res.status(200).send({ status: "success", payload: user })
 }
 
-const passwordRestoreRequest = async (req, res) => { // En /api/sessions/passwordRestoreRequest con el método POST se envía un mail pidiendo reestablecer contraseña
+const passwordRestoreRequest = async (req: Request, res: Response) => { // En /api/sessions/passwordRestoreRequest con el método POST se envía un mail pidiendo reestablecer contraseña
     const { email } = req.body
     
     if (!email) {
@@ -114,7 +118,7 @@ const passwordRestoreRequest = async (req, res) => { // En /api/sessions/passwor
     try {
         await sendMail({ // Se envía al mail un link donde se podrá cambiar la contraseña
             from: "Proyecto backend",
-            to: `${email}`,
+            to: email,
             subject: `Sitio de películas | Reestablecimiento de contraseña`,
             html:`
             <div>
@@ -124,14 +128,14 @@ const passwordRestoreRequest = async (req, res) => { // En /api/sessions/passwor
             </div>
             `
         })
-        res.status(200).send({ status: "success", message: `Solicitud para reestablecer mail enviada a ${email}` })
+        return res.status(200).send({ status: "success", message: `Solicitud para reestablecer mail enviada a ${email}` })
     } catch (error) {
         req.logger.error(`${req.infoPeticion} | ${error}`)
         return res.status(500).send({ status: "error", error })
     }
 }
 
-const restorePassword = async (req, res) => { // En /api/sessions/restorePassword con el método PUT, se reestablece la contraseña de un usuario
+const restorePassword = async (req: Request, res: Response) => { // En /api/sessions/restorePassword con el método PUT, se reestablece la contraseña de un usuario
     const { password, token } = req.body // Del body tiene que llegar la nueva contraseña y el email tokenizado
     
     try {
@@ -140,8 +144,8 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
             return res.status(400).send({ status: "error", error: "Contraseña inválida" })
         }
 
-        const { email } = jwt.verify(token, config.jwt.secret) // Descifro el email
-    
+        const { email } = jwt.verify(token, config.jwt.secret) as { email: Email } // Descifro el email
+
         const user = await userService.getBy({ email })
         if (!user) {
             req.logger.error(`${req.infoPeticion} | No user found with this email`)
@@ -151,9 +155,9 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
         const newPassword = await createHash(password) // Cambiamos la contraseña del usuario, pero primero la hasheamos
         await userService.updateBy({ _id: user._id }, {$set: { password: newPassword }})
         
-        res.send({ status: "success", message: "Contraseña cambiada" })
+        return res.send({ status: "success", message: "Contraseña cambiada" })
     } catch (error) {
-        if (error.expiredAt) {
+        if (error instanceof jwt.TokenExpiredError && error.expiredAt) {
             req.logger.error(`${req.infoPeticion} | Token expirado, tiempo para reestablecer la contraseña agotado | ${error}`)
             return res.status(403).send({ status: "error", error: "Tiempo para reestablecer la contraseña agotado" })
         }
@@ -163,7 +167,7 @@ const restorePassword = async (req, res) => { // En /api/sessions/restorePasswor
     }
 }
 
-const logout = async (req, res) => { // En /api/sessions/logout con el método GET se desloguea al usuario actual, si es que había uno logueado
+const logout = async (req: Request, res: Response) => { // En /api/sessions/logout con el método GET se desloguea al usuario actual, si es que había uno logueado
     try {
         res.clearCookie(config.jwt.nameCookie, {
             httpOnly: true,

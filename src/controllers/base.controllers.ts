@@ -1,12 +1,13 @@
 import sendMail from "../services/mailingService.js";
 import __dirname from "../utils.js";
 import config from "../config/config.js";
+import { Request, Response } from "express";
 
-const base = async (req, res) => { // Renderiza una pequeña presentación en la ruta "/"
+const base = async (_req: Request, res: Response) => { // Renderiza una pequeña presentación en la ruta "/"
     res.render("index", { frontendUrl: config.site.urlfrontend })
 }
 
-const sendNewMail = async (req, res) => { // En api/sendNewMail con el método POST envía un mail con los valores pasados en el body
+const sendNewMail = async (req: Request, res: Response) => { // En api/sendNewMail con el método POST envía un mail con los valores pasados en el body
     const { from, to, subject, html } = req.body
 
     if (!from || !to || !subject || !html) {
@@ -22,10 +23,10 @@ const sendNewMail = async (req, res) => { // En api/sendNewMail con el método P
             html
         })
 
-        res.status(200).send({status: "success", message: "Enviado"})
+        return res.status(200).send({status: "success", message: "Enviado"})
     } catch (error) {
         req.logger.fatal(`${req.infoPeticion} | ${error}`)
-        res.status(500).send({status: "error", error})
+        return res.status(500).send({status: "error", error})
     }
 }
 

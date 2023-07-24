@@ -1,6 +1,7 @@
+import { NextFunction, Request, Response } from "express"
 import config from "../config/config.js"
 
-const checkPermissions = (req, res, next) => { // Chequea si la persona que hace peticiones está autorizado para eso
+const checkPermissions = (req: Request, res: Response, next: NextFunction) => { // Chequea si la persona que hace peticiones está autorizado para eso
     if (req.url.includes("/api/sessions/login") || req.url.includes("/api/sessions/logout")) return next() // No quiero que exista ese chequeo para loguearte y desloguearte
     
     if (req.headers.origin?.includes(config.site.urlfrontend)) { // Entra en este if si hacemos la petición desde el frontend. Gracias al módulo cors sé que las peticiones desde el cliente siempre van a tener el origin

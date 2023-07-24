@@ -1,5 +1,7 @@
+import { Models } from "../../types/types"
+
 class Product {
-    static get model() { // Nombre de la colección a manipular
+    static get model(): Models["product"] { // Nombre de la colección a manipular
         return "products"
     }
 
@@ -24,10 +26,6 @@ class Product {
             },
             stock: {
                 type: Number,
-                required: true
-            },
-            code: {
-                type: String,
                 required: true
             }
         }

@@ -1,8 +1,9 @@
 import multer from "multer";
 import __dirname from "../utils.js";
+import { Request } from "express";
 
 const storage = multer.diskStorage({ // Configura un almacenamiento de servidor en disco
-    destination: (req, file, cb) => { // Destino (la ruta ya debe estar creada)
+    destination: (req: Request, _file, cb) => { // Destino (la ruta ya debe estar creada)
         if (req.originalUrl == "/api/sessions/register") {
             cb(null, __dirname + "/public/images/profiles")
         } else if (req.originalUrl == "/api/products" || req.originalUrl.includes("/api/products/")) {
@@ -12,13 +13,13 @@ const storage = multer.diskStorage({ // Configura un almacenamiento de servidor 
             cb(null, __dirname + "/public/images")
         }
     },
-    filename: (req, file, cb) => { // Nombre del archivo cargado
+    filename: (_req, file, cb) => { // Nombre del archivo cargado
         cb(null, (Date.now()+"-"+file.originalname).replaceAll(" ", "_"))
     }
 })
 
 // Verificación del tipo de archivo
-function fileFilter(req, file, cb) {
+function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
     if (file.mimetype.startsWith('image/')) {
         cb(null, true); // Acepta el archivo si es una imagen, y la rechaza si no lo es
     } else {
